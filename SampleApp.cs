@@ -352,15 +352,19 @@ namespace CSharp_SampleApp
             //(int)Keyboard.RZKEY.RZKEY_INVALID,
 
             }; //ordine accensione tastiera
-                
+                int RPM=0;
                 int frameCount = 120;
                 int rpm = 0;
                 bool c = true;
                 bool call=false;
                 String MEMORY_LOCATION = "Local\\acpmf_physics";
-                changeRpm(0);
+                changeLowRpm();
                 
-
+                int changeRpm(int RPM1) {
+                    rpm = RPM1;
+                    Console.WriteLine(rpm);
+                    return rpm;
+                }
                 //changeRpm(0);
                 void changeHighRpm()
                 {
@@ -404,8 +408,9 @@ namespace CSharp_SampleApp
 
 
 
-                void changeRpm(int RPM)
+                void changeLowRpm()
                 {
+                    
                     string baseLayerChromaLink = "Animations/Blank_ChromaLink.chroma";
                     ChromaAnimationAPI.CloseAnimationName(baseLayerChromaLink);
                     ChromaAnimationAPI.GetAnimation(baseLayerChromaLink);
@@ -432,17 +437,18 @@ namespace CSharp_SampleApp
                         float speed = 0.05f;
                         for (int frameId = 0; frameId < frameCount; ++frameId)
                         {
+                        
 
-                            t += speed;
+                        t += speed;
                             float hp = (float)Math.Abs(Math.Cos(Math.PI / 2.0f + t));
                             for (int i = 0; i < keys.Length; ++i)
                             {
-                                float ratio = (i + 1) / keys.Length;
+                            float ratio = (i + 1) / keys.Length;
                                 int color = ChromaAnimationAPI.GetRGB(0, (int)(255 * (1 - hp)), 0);
                                 if ((i + 1) / (float)(keys.Length + 1) < hp)
                                 {
 
-                                    if (i > 75)
+                                    if (i > 75&&rpm>7000)
                                     {
 
                                         {
@@ -452,7 +458,7 @@ namespace CSharp_SampleApp
                                         }
 
                                     }
-                                    else if (i > 40)
+                                    else if (i > 40 &&rpm>5500)
                                     {
                                         color = ChromaAnimationAPI.GetRGB(255, 255, 0);
 
@@ -568,8 +574,10 @@ namespace CSharp_SampleApp
 
                     char[] radiant = new char[] { rad0[1][0], rad0[1][1], rad0[1][2], rad0[1][3] };
                     string radiantsminut = new string(radiant);
-                   // Console.WriteLine(radiantsminut);
-                    int RPM = int.Parse(radiantsminut);
+                    // Console.WriteLine(radiantsminut);
+                    
+                   
+                    RPM = int.Parse(radiantsminut);
 
                     if (call == false && c == true && RPM >= 7200)
                     {
@@ -588,14 +596,17 @@ namespace CSharp_SampleApp
                         
                         rpm = RPM;
                         c = true;
-                        changeRpm(0);
+                        changeLowRpm();
                         call = false;
                         Thread.Sleep(1);
 
                     }
-                    //Console.WriteLine(rpm);
-                    //Console.WriteLine(call);
-                    //Console.WriteLine(c);
+                    changeRpm(RPM);
+
+                        //Console.WriteLine(rpm);
+                        //Console.WriteLine(call);
+                        //Console.WriteLine(c);
+                    
 
                 }
             }
