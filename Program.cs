@@ -18,10 +18,10 @@ namespace CSharp_SampleApp
 
             Console.WriteLine("C# CHROMA SAMPLE APP");
             Console.WriteLine("Use `UP` and `DOWN` arrows to select an animation and press `ENTER` to execute.");
-            if (supportsStreaming)
-            {
-                Console.Write("Use `P` to switch streaming platforms. ");
-            }
+            //if (supportsStreaming)
+            //{
+            //    Console.Write("Use `P` to switch streaming platforms. ");
+            //}
             Console.WriteLine("Use `ESC` to QUIT.");
 
             int startIndex = 1;
@@ -51,8 +51,6 @@ namespace CSharp_SampleApp
                 }
             }
 
-            Console.WriteLine();
-            Console.WriteLine();
             Console.WriteLine("Press ENTER to play selection.");
         }
 
@@ -75,43 +73,44 @@ namespace CSharp_SampleApp
 
                 DateTime inputTimer = DateTime.MinValue;
 
-                while (true)
+                //while (true)
                 {
-                    if (inputTimer < DateTime.Now)
-                    {
-                        Console.Clear();
-                        PrintLegend(sampleApp, selectedIndex, supportsStreaming, platform);
-                        inputTimer = DateTime.Now + TimeSpan.FromMilliseconds(100);
-                    }
-                    ConsoleKeyInfo keyInfo = Console.ReadKey();
+                    //if (inputTimer < DateTime.Now)
+                    //{
+                    //    Console.Clear();
+                    //    PrintLegend(sampleApp, selectedIndex, supportsStreaming, platform);
+                    //    inputTimer = DateTime.Now + TimeSpan.FromMilliseconds(100);
+                    //}
+                   // ConsoleKeyInfo keyInfo = Console.ReadKey();
 
-                    if (keyInfo.Key == ConsoleKey.UpArrow)
+                    //if (keyInfo.Key == ConsoleKey.UpArrow)
+                    //{
+                    //    if (selectedIndex > startIndex)
+                    //    {
+                    //        --selectedIndex;
+                    //    }
+                    //}
+                    //else if (keyInfo.Key == ConsoleKey.DownArrow)
+                    //{
+                    //    if (selectedIndex < MAX_ITEMS)
+                    //    {
+                    //        ++selectedIndex;
+                    //    }
+                    //}
+                    //else
+                   // if (keyInfo.Key == ConsoleKey.Escape)
                     {
-                        if (selectedIndex > startIndex)
-                        {
-                            --selectedIndex;
-                        }
+                        //break;
                     }
-                    else if (keyInfo.Key == ConsoleKey.DownArrow)
-                    {
-                        if (selectedIndex < MAX_ITEMS)
-                        {
-                            ++selectedIndex;
-                        }
-                    }
-                    else if (keyInfo.Key == ConsoleKey.Escape)
-                    {
-                        break;
-                    }
-                    else if (keyInfo.Key == ConsoleKey.P)
-                    {
-                        platform = (byte)((platform + 1) % 4); //PC, AMAZON LUNA, MS GAME PASS, NVIDIA GFN
-                    }
-                    else if (keyInfo.Key == ConsoleKey.Enter)
-                    {
-                        
-                        sampleApp.ExecuteItem(selectedIndex, supportsStreaming, platform);
-                    }
+                    //else if (keyInfo.Key == ConsoleKey.P)
+                    //{
+                    //    platform = (byte)((platform + 1) % 4); //PC, AMAZON LUNA, MS GAME PASS, NVIDIA GFN
+                    //}
+                    //else if (keyInfo.Key == ConsoleKey.Enter)
+                    //{
+
+                    sampleApp.ExecuteItem(selectedIndex, supportsStreaming, platform);
+                    //}
                     Thread.Sleep(1);
                 }
 

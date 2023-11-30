@@ -172,59 +172,14 @@ namespace CSharp_SampleApp
         {
             
             bool ok = true;
-            while (ok) {
-                ConsoleKeyInfo keyInfo = Console.ReadKey();
+            //while (ok) {
+                //ConsoleKeyInfo keyInfo = Console.ReadKey();
 
-                if (keyInfo.Key == ConsoleKey.Escape) //blocca l'esecuzione
-                {
-                    break;
-                }
-                /* string baseLayer = "Animations/Blank_Keyboard.chroma";
-                 ChromaAnimationAPI.CloseAnimationName(baseLayer);
-                 ChromaAnimationAPI.GetAnimation(baseLayer);
-                 int frameCount = 120;
-                 ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayer, frameCount, 0.1f, 64, 64, 64);
-                 int[] keys = {
-                     (int)Keyboard.RZKEY.RZKEY_W,
-                     (int)Keyboard.RZKEY.RZKEY_A,
-                     (int)Keyboard.RZKEY.RZKEY_S,
-                     (int)Keyboard.RZKEY.RZKEY_D,
-                 };
-                 ChromaAnimationAPI.SetKeysColorAllFramesRGBName(baseLayer, keys, keys.Length, 255, 255, 0);
-                 keys = new int[] {
-                     (int)Keyboard.RZKEY.RZKEY_F1,
-                     (int)Keyboard.RZKEY.RZKEY_F2,
-                     (int)Keyboard.RZKEY.RZKEY_F3,
-                     (int)Keyboard.RZKEY.RZKEY_F4,
-                     (int)Keyboard.RZKEY.RZKEY_F5,
-                     (int)Keyboard.RZKEY.RZKEY_F6,
-                 };
-                 float t = 0;
-                 float speed = 0.05f;
-                 for (int frameId = 0; frameId < frameCount; ++frameId)
-                 {
-                     t += speed;
-                     float hp = (float)Math.Abs(Math.Cos(Math.PI / 2.0f + t));
-                     for (int i = 0; i < keys.Length; ++i)
-                     {
-                         float ratio = (i + 1) / keys.Length;
-                         int color = ChromaAnimationAPI.GetRGB(0, (int)(255 * (1 - hp)), 0);
-                         if ((i + 1) / (float)(keys.Length + 1) < hp)
-                         {
-                             color = ChromaAnimationAPI.GetRGB(0, 255, 0);
-                         }
-                         else
-                         {
-                             color = ChromaAnimationAPI.GetRGB(0, 100, 0);
-                         }
-                         int key = keys[i];
-                         ChromaAnimationAPI.SetKeyColorName(baseLayer, frameId, key, color);
-                     }
-                 }
-                 ChromaAnimationAPI.SetChromaCustomFlagName(baseLayer, true);
-                 ChromaAnimationAPI.SetChromaCustomColorAllFramesName(baseLayer);
-                 ChromaAnimationAPI.OverrideFrameDurationName(baseLayer, 0.033f);
-                 ChromaAnimationAPI.PlayAnimationName(baseLayer, true);*/
+                //if (keyInfo.Key == ConsoleKey.Escape) //blocca l'esecuzione
+                //{
+                //    break;
+                //}
+                bool start=true;
                 int[] keys = {
             (int)Keyboard.RZKEY.RZKEY_ESC,
             (int)Keyboard.RZKEY.RZKEY_OEM_1, //backslash \
@@ -355,20 +310,22 @@ namespace CSharp_SampleApp
                 int RPM=0;
                 int frameCount = 120;
                 int rpm = 0;
+                int attemp = 0;
                 bool c = true;
                 bool call=false;
                 String MEMORY_LOCATION = "Local\\acpmf_physics";
                 changeLowRpm();
-                
-                int changeRpm(int RPM1) {
+                mapFilePhisics();
+                void changeRpm(int RPM1) {
                     rpm = RPM1;
-                    Console.WriteLine(rpm);
-                    return rpm;
+                    
+                    Console.WriteLine("ciao"+rpm);
+                    
                 }
                 //changeRpm(0);
                 void changeHighRpm()
                 {
-
+                    
                         string baseLayer = "Animations/Blank_Keyboard.chroma";
                     // close the blank animation if it's already loaded, discarding any changes
                         ChromaAnimationAPI.CloseAnimationName(baseLayer);
@@ -403,82 +360,63 @@ namespace CSharp_SampleApp
 
                 }
 
-                
-
-
-
-
-                void changeLowRpm()
+                void changeOrangeRpm()
                 {
-                    
+                    //blocca il rosso su crhomalink
                     string baseLayerChromaLink = "Animations/Blank_ChromaLink.chroma";
                     ChromaAnimationAPI.CloseAnimationName(baseLayerChromaLink);
                     ChromaAnimationAPI.GetAnimation(baseLayerChromaLink);
-                    // the length of the animation
-                    // set all frames to white, with all frames set to 30FPS
-                    ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayerChromaLink, frameCount, 0.016f, 0, 0, 0);
-                    // fade the start of the animation starting at frame zero to 40
-                    ChromaAnimationAPI.FadeStartFramesName(baseLayerChromaLink, 5);
+                    // set all frames to Orange, with all frames
+                    ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayerChromaLink, frameCount, 0f, 255, 60, 0);
                     // play the animation on the dynamic canvas
                     ChromaAnimationAPI.PlayAnimationName(baseLayerChromaLink, true);
 
                     string baseLayer = "Animations/Blank_Keyboard.chroma";
                     ChromaAnimationAPI.CloseAnimationName(baseLayer);
                     ChromaAnimationAPI.GetAnimation(baseLayer);
-                    frameCount = 120;
-                        ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayer, frameCount, 0.1f, 64, 64, 64);
+                    ChromaAnimationAPI.SetKeysColorAllFramesRGBName(baseLayer, keys, keys.Length, 255, 60, 0);
+                    ChromaAnimationAPI.SetChromaCustomColorAllFramesName(baseLayer);
+                    ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
 
-                        ChromaAnimationAPI.SetKeysColorAllFramesRGBName(baseLayer, keys, keys.Length, 0, 0, 255);
+                }
 
-                        //int milliseconds = 2000;
-                        //Thread.Sleep(milliseconds);
+                void changeGreenRpm()
+                {
+                    //blocca il rosso su crhomalink
+                    string baseLayerChromaLink = "Animations/Blank_ChromaLink.chroma";
+                    ChromaAnimationAPI.CloseAnimationName(baseLayerChromaLink);
+                    ChromaAnimationAPI.GetAnimation(baseLayerChromaLink);
+                    // set all frames to green, with all frames
+                    ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayerChromaLink, frameCount, 0f, 0, 125,0 );
+                    // play the animation on the dynamic canvas
+                    ChromaAnimationAPI.PlayAnimationName(baseLayerChromaLink, true);
 
-                        float t = 0;
-                        float speed = 0.05f;
-                        for (int frameId = 0; frameId < frameCount; ++frameId)
-                        {
-                        
+                    string baseLayer = "Animations/Blank_Keyboard.chroma";
+                    ChromaAnimationAPI.CloseAnimationName(baseLayer);
+                    ChromaAnimationAPI.GetAnimation(baseLayer);
+                    ChromaAnimationAPI.SetKeysColorAllFramesRGBName(baseLayer, keys, keys.Length, 0, 125,0 );
+                    ChromaAnimationAPI.SetChromaCustomColorAllFramesName(baseLayer);
+                    ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
+                }
 
-                        t += speed;
-                            float hp = (float)Math.Abs(Math.Cos(Math.PI / 2.0f + t));
-                            for (int i = 0; i < keys.Length; ++i)
-                            {
-                            float ratio = (i + 1) / keys.Length;
-                                int color = ChromaAnimationAPI.GetRGB(0, (int)(255 * (1 - hp)), 0);
-                                if ((i + 1) / (float)(keys.Length + 1) < hp)
-                                {
 
-                                    if (i > 75&&rpm>7000)
-                                    {
+                    void changeLowRpm()
+                {
+                    //blocca il rosso su crhomalink
+                    string baseLayerChromaLink = "Animations/Blank_ChromaLink.chroma";
+                    ChromaAnimationAPI.CloseAnimationName(baseLayerChromaLink);
+                    ChromaAnimationAPI.GetAnimation(baseLayerChromaLink);
+                    // set all frames to blu, with all frames
+                    ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayerChromaLink, frameCount, 0f, 0, 0,125);
+                    // play the animation on the dynamic canvas
+                    ChromaAnimationAPI.PlayAnimationName(baseLayerChromaLink, true);
 
-                                        {
-
-                                            color = ChromaAnimationAPI.GetRGB(255, 0, 0);
-
-                                        }
-
-                                    }
-                                    else if (i > 40 &&rpm>5500)
-                                    {
-                                        color = ChromaAnimationAPI.GetRGB(255, 255, 0);
-
-                                    }
-                                    else
-                                        color = ChromaAnimationAPI.GetRGB(0, 255, 0);
-
-                                }
-                                else
-                                {
-                                    color = ChromaAnimationAPI.GetRGB(0, 0, 0);
-                                }
-                                int key = keys[i];
-                                ChromaAnimationAPI.SetKeyColorName(baseLayer, frameId, key, color);
-                            }
-                        }
-                        ChromaAnimationAPI.SetChromaCustomFlagName(baseLayer, true);
-                        ChromaAnimationAPI.SetChromaCustomColorAllFramesName(baseLayer);
-                        ChromaAnimationAPI.OverrideFrameDurationName(baseLayer, 0.033f);
-                        ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
+                    string baseLayer = "Animations/Blank_Keyboard.chroma";
+                    ChromaAnimationAPI.CloseAnimationName(baseLayer);
+                    ChromaAnimationAPI.GetAnimation(baseLayer);
+                    ChromaAnimationAPI.SetKeysColorAllFramesRGBName(baseLayer, keys, keys.Length, 0,0,125);
+                    ChromaAnimationAPI.SetChromaCustomColorAllFramesName(baseLayer);
+                    ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
 
 
                     //animazione originale 45
@@ -532,14 +470,28 @@ namespace CSharp_SampleApp
 
 
                 }
+                void mapFilePhisics(){
+                    do
+                    {
+                        try
+                        {
+                            using (MemoryMappedFile mmf = MemoryMappedFile.OpenExisting(MEMORY_LOCATION))
+                            {
+                                runStream(mmf);
+                                break;
+                            }
+                        }
+                        catch (Exception)
+                        {
 
-
-
-
-                using (MemoryMappedFile mmf = MemoryMappedFile.OpenExisting(MEMORY_LOCATION))
-                {
-                    runStream(mmf);
+                            Console.WriteLine("in attesa di connettersi al gioco");
+                            Thread.Sleep(10000);
+                        }
+                    } while (true);
                 }
+                
+
+
                 void runStream(MemoryMappedFile aMemoryMappedFile)
                 {
                     using (MemoryMappedViewStream myStream = aMemoryMappedFile.CreateViewStream())
@@ -568,18 +520,53 @@ namespace CSharp_SampleApp
                         aSleepMillis, aPacketId, aReader.ReadSingle(), aReader.ReadSingle(), aReader.ReadSingle(), aReader.ReadInt32(), aReader.ReadInt32(), aReader.ReadSingle());
                     //Console.WriteLine(myOutput);
 
-                    string[] rad0 = (myOutput.ToString()).Split(':');
+
+                    //estrapolo gli rpm
+                    string[] rad0 = myOutput.ToString().Split(':');
 
                     //Console.WriteLine(rad0[1] + "rad0");
 
                     char[] radiant = new char[] { rad0[1][0], rad0[1][1], rad0[1][2], rad0[1][3] };
                     string radiantsminut = new string(radiant);
                     // Console.WriteLine(radiantsminut);
-                    
-                   
-                    RPM = int.Parse(radiantsminut);
+                    //Console.WriteLine(RPM);
 
-                    if (call == false && c == true && RPM >= 7200)
+                    do
+                    {
+
+
+                        try
+                        {
+                        Console.WriteLine("Connesso e in azione");
+                        RPM = 0;
+                            RPM = int.Parse(radiantsminut);
+                            start = false;
+                            break;
+                        }
+                        catch (Exception)
+                        {
+                            if (attemp > 10)
+                            {
+                                Console.WriteLine("riavvio");
+                                attemp = 0;
+                                mapFilePhisics();
+
+
+                            }
+                            RPM = 0;
+                            Console.WriteLine(RPM);
+                            Console.WriteLine("attesa avvio motore");
+                            Thread.Sleep(3000);
+                            attemp++;
+                            Console.WriteLine("ho effettuato "+attemp+" tentativi");
+                            
+
+                        }
+                    } while (start==true); 
+                    if (RPM!=0)
+                    {
+                        RPM = int.Parse(radiantsminut);
+                        if ( c == true && RPM >= 7200 && call==false)
                     {
 
                         rpm = 7200;
@@ -591,25 +578,42 @@ namespace CSharp_SampleApp
 
                     }
                     //Console.WriteLine("condizione2= "+(call == true && c == false && RPM < 7200));
-                    if (call == true && c == false && RPM < 7200)
+                    if ( c == false && RPM < 7200 &&RPM>6800 && call==true)
                         {
                         
                         rpm = RPM;
                         c = true;
-                        changeLowRpm();
+                        changeOrangeRpm() ;
                         call = false;
                         Thread.Sleep(1);
 
                     }
-                    changeRpm(RPM);
+                    if (c == true && RPM < 6800 && RPM > 5000 && call==false)
+                    {
 
-                        //Console.WriteLine(rpm);
-                        //Console.WriteLine(call);
-                        //Console.WriteLine(c);
-                    
+                        rpm = RPM;
+                        c = false;
+                        changeGreenRpm();
+                        call = true;
+                        Thread.Sleep(1);
+
+                    }
+                    if (RPM < 4000)
+                    {
+                        c = true;
+                        changeLowRpm();
+                        call = false;
+                    }
+                   
+                    }
+                    //Console.WriteLine(rpm);
+                    //Console.WriteLine(call);
+                    //Console.WriteLine(c);
+                    // changeLowRpm();
+
 
                 }
-            }
+            //}
         }
 
         
