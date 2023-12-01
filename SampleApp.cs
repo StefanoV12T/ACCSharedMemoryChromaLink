@@ -3,8 +3,10 @@ using System;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Services;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 using static ChromaSDK.Keyboard;
@@ -179,7 +181,7 @@ namespace CSharp_SampleApp
                 //{
                 //    break;
                 //}
-                bool start=true;
+                
                 int[] keys = {
             (int)Keyboard.RZKEY.RZKEY_ESC,
             (int)Keyboard.RZKEY.RZKEY_OEM_1, //backslash \
@@ -310,11 +312,16 @@ namespace CSharp_SampleApp
                 int RPM=0;
                 int frameCount = 120;
                 int rpm = 0;
-                int attemp = 0;
+                int attempt = 0;
                 bool c = true;
                 bool call=false;
-                String MEMORY_LOCATION = "Local\\acpmf_physics";
+                bool start = true;
+                int RPMMax=2;
+                String MEMORY_LOCATION_PHYSICS = "Local\\acpmf_physics";
+                String MEMORY_LOCATION_STATIC = "Local\\acpmf_static";
+                var data = new MyStatic();
                 changeLowRpm();
+                mapFileStatic();
                 mapFilePhisics();
                 void changeRpm(int RPM1) {
                     rpm = RPM1;
@@ -470,14 +477,17 @@ namespace CSharp_SampleApp
 
 
                 }
-                void mapFilePhisics(){
+                void mapFilePhisics()
+                {
+
                     do
                     {
                         try
                         {
-                            using (MemoryMappedFile mmf = MemoryMappedFile.OpenExisting(MEMORY_LOCATION))
+                            using (MemoryMappedFile mmf = MemoryMappedFile.OpenExisting(MEMORY_LOCATION_PHYSICS))
                             {
-                                runStream(mmf);
+                            start = true;
+                            runStream(mmf);
                                 break;
                             }
                         }
@@ -489,16 +499,160 @@ namespace CSharp_SampleApp
                         }
                     } while (true);
                 }
-                
 
 
-                void runStream(MemoryMappedFile aMemoryMappedFile)
+            void mapFileStatic()
+            {
+                trueStart();
+                do
+                {
+                    try
+                    {
+                        using (MemoryMappedFile mms = MemoryMappedFile.OpenExisting(MEMORY_LOCATION_STATIC))
+                        {
+                            using (var accessor = mms.CreateViewAccessor())
+                            {
+                                data.sharedMemoryVersion = "";
+                                data.accVersion = "";
+                                data.numberSessions = accessor.ReadInt32(60);
+                                data.numCars = accessor.ReadInt32(64);
+                                data.carModel = "";
+                                data.track = "";
+                                data.namePilot = "";
+                                data.surnamePilot = "";
+                                data.nicknamePilot = "";
+                                data.sectorCount = accessor.ReadInt32(400); //360
+                                data.maxTorque = 0f;
+                                data.maxPower = 0f;
+                                data.maxRpm = accessor.ReadInt32(412);
+                                data.maxFuel = accessor.ReadSingle(416);
+                                data.suspensionMaxTravel = accessor.ReadSingle(420);// [4]...//424,428,432
+                                data.tyreRadius = accessor.ReadSingle(436); //[4]... //440,444,448
+                                data.maxTurboBoost = accessor.ReadSingle(452);
+                                data.deprecated1 = accessor.ReadSingle(456);
+                                data.deprecated2 = accessor.ReadSingle(460);
+                                data.penaltiesEnabled = accessor.ReadInt32(464);
+                                data.aidFuelrate = accessor.ReadSingle(468);
+                                data.aidTyreRate = accessor.ReadSingle(472);
+                                data.aidMechanicalDamage = accessor.ReadSingle(476);
+                                data.AllowTyreBlankets = accessor.ReadSingle(480);//??
+                                data.aidStability = accessor.ReadSingle(484);
+                                data.aidAutoclutch = accessor.ReadInt32(488);
+                                data.aidAutoBlip = accessor.ReadInt32(492);
+                                data.hasDRS = accessor.ReadInt32(496);//Not used in ACC
+                                data.hasERS = accessor.ReadInt32(500); //Not used in ACC
+                                data.hasKERS = accessor.ReadInt32(504);//Not used in ACC
+                                data.kersMaxJ = accessor.ReadSingle(508); //Not used in ACC
+                                data.engineBrakeSettingsCount = accessor.ReadInt32(512);//Not used in ACC
+                                data.ersPowerControllerCount = accessor.ReadInt32(516);//Not used in ACC
+                                data.trackSplineLength = accessor.ReadInt32(520);//Not used in ACC
+                                data.trackConfiguration = "";//Not used in ACC[524]
+                                data.ersMaxJ = accessor.ReadInt32(528);//Not used in ACC
+                                data.isTimedRace = accessor.ReadInt32(532);//Not used in ACC
+                                data.hasExtraLap = accessor.ReadInt32(536);//Not used in ACC
+                                data.carSkin = "";//[33]Not used in ACC [540]
+                                data.reversedGridPositions = accessor.ReadInt32(570);//Not used in ACC
+                                data.PitWindowStart = accessor.ReadInt32(574);//Pit window opening time
+                                data.PitWindowEnd = accessor.ReadInt32(578);//Pit windows closing time
+                                data.isOnline = accessor.ReadInt32(582);//If is a multiplayer session
+                                data.dryTyresName = "";//[33]Name of the dry tyres
+                                data.wetTyresName = "";//[33]Name of the wet tyres
+
+
+                                // Read the data from the accessor
+                                //accessor.Read(0, out data);
+                                var sharedMemoryVersion = new char[15];
+                                var accVersion = new char[15];
+                                var carModel = new char[33];
+                                var track = new char[33];
+                                var namePilot = new char[33];
+                                var surnamePilot = new char[33];
+                                var nicknamePilot = new char[33];
+                                var dryTyresName = new char[33];
+                                var wetTyresName = new char[33];
+                                var maxTorque = accessor.ReadSingle(197);
+                                var maxPower = accessor.ReadSingle(198);
+                                var maxRpm = accessor.ReadInt32(199);
+                                var maxFuel = accessor.ReadSingle(200);
+
+
+                                accessor.ReadArray(0, sharedMemoryVersion, 0, 15);
+                                accessor.ReadArray(30, accVersion, 0, 15);
+                                accessor.ReadArray(68, carModel, 0, 33);
+                                accessor.ReadArray(100, track, 0, 33);
+                                accessor.ReadArray(156, namePilot, 0, 33);
+                                accessor.ReadArray(218, surnamePilot, 0, 33);
+                                accessor.ReadArray(296, nicknamePilot, 0, 33);
+                                accessor.ReadArray(584, dryTyresName, 0, 33);
+                                accessor.ReadArray(614, wetTyresName, 0, 33);
+
+                                data.sharedMemoryVersion = new string(sharedMemoryVersion);
+                                data.accVersion = new string(accVersion);
+                                data.carModel = new string(carModel);
+                                data.track = new string(track);
+                                data.namePilot = new string(namePilot);
+                                data.surnamePilot = new string(surnamePilot);
+                                data.nicknamePilot = new string(nicknamePilot);
+                                data.dryTyresName = new string(dryTyresName);
+                                data.wetTyresName = new string(wetTyresName);
+                                //data.char5 = new string(char1);
+
+
+                                
+                                //accessor.Read(0, out data);
+                                // Write the data to the accessor
+                                //accessor.Write(0, ref data);
+                                Console.WriteLine("Memory Version: " + data.sharedMemoryVersion);
+                                Console.WriteLine("ACC Version: " + data.accVersion);
+                                Console.WriteLine(data.numberSessions);
+                                Console.WriteLine(data.numCars);
+                                Console.WriteLine("Auto: " + data.carModel);
+                                Console.WriteLine("Tracciato: " + data.track);
+                                Console.WriteLine("Nome Pilota: " + data.namePilot);
+                                Console.WriteLine("Cognome Pilota: " + data.surnamePilot);
+                                Console.WriteLine("NikcName Pilota: " + data.nicknamePilot);
+                                Console.WriteLine("Numero di settori: " + data.sectorCount);
+                                Console.WriteLine("Massima Coppia: " + data.maxTorque);
+                                Console.WriteLine("Massima Potenza: " + data.maxPower);
+                                Console.WriteLine("maxRpm: " + data.maxRpm);
+                                Console.WriteLine("Capacità Massima Serbatoio: " + data.maxFuel);
+                                Console.WriteLine("Travel " + data.suspensionMaxTravel);
+                                Console.WriteLine("Raggio Gomme: " + data.tyreRadius);
+                                Console.WriteLine("Pressione Massima Turbo: " + data.maxTurboBoost);
+                                Console.WriteLine("Penalità abilitate: " + data.penaltiesEnabled);
+                                Console.WriteLine("Consumo Carburante: " + data.aidFuelrate);
+                                Console.WriteLine("Consumo Gomme: " + data.aidTyreRate);
+                                Console.WriteLine("Danno Meccanico: " + data.aidMechanicalDamage);
+                                Console.WriteLine("TermoCoperte: " + data.AllowTyreBlankets);
+                                Console.WriteLine("Controllo Stabilità: " + data.aidStability);
+                                Console.WriteLine("Frizione Automatica: " + data.aidAutoclutch);
+                                Console.WriteLine("Punta Tacco Automatico: " + data.aidAutoBlip);
+                                Console.WriteLine("Pit Window Open: " + data.PitWindowStart);
+                                Console.WriteLine("Pit Window Closed: " + data.PitWindowEnd);
+                                Console.WriteLine("Sessione Online: " + data.isOnline);
+                                Console.WriteLine("NomeGomme Asciutto: " + data.dryTyresName);
+                                Console.WriteLine("NomeGomme Bagnato: " + data.wetTyresName);
+                                break;
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+
+                        Console.WriteLine("in attesa di leggere le statistiche del gioco");
+                        Thread.Sleep(10000);
+                    }
+                } while (true);
+            }
+
+
+            void runStream(MemoryMappedFile aMemoryMappedFile)
                 {
                     using (MemoryMappedViewStream myStream = aMemoryMappedFile.CreateViewStream())
                     {
                         BinaryReader myReader = new BinaryReader(myStream);
 
-                        Console.WriteLine("Shake and bake");
+                        Console.WriteLine(start);
                         int mySleepMillis = 17;
                         int myPrevPacketId = 0;
 
@@ -528,45 +682,66 @@ namespace CSharp_SampleApp
 
                     char[] radiant = new char[] { rad0[1][0], rad0[1][1], rad0[1][2], rad0[1][3] };
                     string radiantsminut = new string(radiant);
-                    // Console.WriteLine(radiantsminut);
-                    //Console.WriteLine(RPM);
+                // Console.WriteLine(radiantsminut);
+                //Console.WriteLine(RPM);
 
-                    do
-                    {
-
-
+                while (start == true)
+                {
                         try
                         {
-                        Console.WriteLine("Connesso e in azione");
+                        string auto = Regex.Replace(data.carModel, "[^a-zA-Z0-9_]", "");
+                        switch (auto)
+                        {
+                            case "ferrari_488_gt3":
+                                RPMMax = 7100;
+                                break;
+                            case "ferrari_296_gt3":
+                                RPMMax = 7200;
+                                break;
+                            case "amr_v12_vantage_gt3":
+                                RPMMax = 7600;
+                                break;
+                            case "amr_v8_vantage_gt3":
+                                RPMMax = 7000;
+                                break;
+                            default:
+                                Console.WriteLine("non trovo gli RPMMax, contattare l'amministratore del programma");
+                                break;
+
+                        }
+                        //Console.WriteLine(start);
                         RPM = 0;
                             RPM = int.Parse(radiantsminut);
-                            start = false;
-                            break;
-                        }
-                        catch (Exception)
+                        Console.WriteLine("l'auto è: " + auto + " e i giri max sono: " + RPMMax);
+                        Console.WriteLine("Connesso e in azione");
+                            falseStart();
+                            //Console.WriteLine(start);
+
+                    }
+                    catch (Exception)
                         {
-                            if (attemp > 10)
+                            if (attempt > 10)
                             {
                                 Console.WriteLine("riavvio");
-                                attemp = 0;
+                                attempt = 0;
+                                trueStart();
+                                mapFileStatic();
                                 mapFilePhisics();
-
-
                             }
                             RPM = 0;
-                            Console.WriteLine(RPM);
                             Console.WriteLine("attesa avvio motore");
                             Thread.Sleep(3000);
-                            attemp++;
-                            Console.WriteLine("ho effettuato "+attemp+" tentativi");
-                            
-
+                            trueStart();
+                            attempt++;
+                            Console.WriteLine("ho effettuato "+attempt+" tentativi");
                         }
-                    } while (start==true); 
+                    } 
                     if (RPM!=0)
                     {
+                        
                         RPM = int.Parse(radiantsminut);
-                        if ( c == true && RPM >= 7200 && call==false)
+                   
+                        if ( c == true && RPM >= RPMMax && call==false)
                     {
 
                         rpm = 7200;
@@ -578,7 +753,7 @@ namespace CSharp_SampleApp
 
                     }
                     //Console.WriteLine("condizione2= "+(call == true && c == false && RPM < 7200));
-                    if ( c == false && RPM < 7200 &&RPM>6800 && call==true)
+                    if ( c == false && RPM < RPMMax &&RPM>(RPMMax-400) && call==true)
                         {
                         
                         rpm = RPM;
@@ -588,7 +763,7 @@ namespace CSharp_SampleApp
                         Thread.Sleep(1);
 
                     }
-                    if (c == true && RPM < 6800 && RPM > 5000 && call==false)
+                    if (c == true && RPM<(RPMMax - 400) && RPM > (RPMMax - 4000) && call==false)
                     {
 
                         rpm = RPM;
@@ -606,17 +781,19 @@ namespace CSharp_SampleApp
                     }
                    
                     }
-                    //Console.WriteLine(rpm);
-                    //Console.WriteLine(call);
-                    //Console.WriteLine(c);
-                    // changeLowRpm();
-
 
                 }
-            //}
+            void falseStart()
+            {
+                start = false;
+            }
+            void trueStart() 
+            {
+                start = true;
+            }
         }
-
         
+
 
         void ShowEffect1ChromaLink()
         {   string baseLayerChromaLink = "Animations/Blank_ChromaLink.chroma";
@@ -712,5 +889,64 @@ namespace CSharp_SampleApp
 
         
         #endregion
+    }
+
+    public struct MyStatic
+    {
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 15)]
+        public string sharedMemoryVersion;
+
+        public string accVersion;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 1)]
+        public int numberSessions;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 1)]
+        public int numCars;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)]
+        public string carModel;
+        public string track;
+        public string namePilot;
+        public string surnamePilot;
+        public string nicknamePilot;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 1)]
+        public int sectorCount;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 1)]
+        public float maxTorque;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 1)]
+        public float maxPower;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 1)]
+        public int maxRpm;
+        public float maxFuel;
+        public float suspensionMaxTravel;// [4]
+        public float tyreRadius;//[4]
+        public float maxTurboBoost;
+        public float deprecated1;
+        public float deprecated2;
+        public int penaltiesEnabled;
+        public float aidFuelrate;
+        public float aidTyreRate;
+        public float aidMechanicalDamage;
+        public float AllowTyreBlankets;
+        public float aidStability;
+        public int aidAutoclutch;
+        public int aidAutoBlip;
+        public int hasDRS;//Not used in ACC
+        public int hasERS; //Not used in ACC
+        public int hasKERS;//Not used in ACC
+        public float kersMaxJ; //Not used in ACC
+        public int engineBrakeSettingsCount;//Not used in ACC
+        public int ersPowerControllerCount;//Not used in ACC
+        public float trackSplineLength;//Not used in ACC
+        public string trackConfiguration;//Not used in ACC
+        public float ersMaxJ;//Not used in ACC
+        public int isTimedRace;//Not used in ACC
+        public int hasExtraLap;//Not used in ACC
+        public string carSkin;//[33]Not used in ACC
+        public int reversedGridPositions;//Not used in ACC
+        public int PitWindowStart;//Pit window opening time
+        public int PitWindowEnd;//Pit windows closing time
+        public int isOnline;//If is a multiplayer session
+        public string dryTyresName;//[33]Name of the dry tyres
+        public string wetTyresName;//[33]Name of the wet tyres
+
     }
 }
