@@ -173,7 +173,7 @@ namespace CSharp_SampleApp
 
         {
             
-            bool ok = true;
+            //bool ok = true;
             //while (ok) {
                 //ConsoleKeyInfo keyInfo = Console.ReadKey();
 
