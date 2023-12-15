@@ -315,7 +315,7 @@ namespace CSharp_SampleApp
                 int attempt = 0;
                 bool c = true;
                 bool call=false;
-                bool start = true;
+                bool start;
                 int RPMMax=2;
                 String MEMORY_LOCATION_PHYSICS = "Local\\acpmf_physics";
                 String MEMORY_LOCATION_STATIC = "Local\\acpmf_static";
@@ -579,9 +579,9 @@ namespace CSharp_SampleApp
                                 accessor.ReadArray(0, sharedMemoryVersion, 0, 15);
                                 accessor.ReadArray(30, accVersion, 0, 15);
                                 accessor.ReadArray(68, carModel, 0, 33);
-                                accessor.ReadArray(100, track, 0, 33);
+                                accessor.ReadArray(124, track, 0, 33);
                                 accessor.ReadArray(156, namePilot, 0, 33);
-                                accessor.ReadArray(218, surnamePilot, 0, 33);
+                                accessor.ReadArray(240, surnamePilot, 0, 33);
                                 accessor.ReadArray(296, nicknamePilot, 0, 33);
                                 accessor.ReadArray(584, dryTyresName, 0, 33);
                                 accessor.ReadArray(614, wetTyresName, 0, 33);
@@ -604,8 +604,8 @@ namespace CSharp_SampleApp
                                 //accessor.Write(0, ref data);
                                 Console.WriteLine("Memory Version: " + data.sharedMemoryVersion);
                                 Console.WriteLine("ACC Version: " + data.accVersion);
-                                Console.WriteLine(data.numberSessions);
-                                Console.WriteLine(data.numCars);
+                                Console.WriteLine("Numero Sessione: " + data.numberSessions);
+                                Console.WriteLine("Numero di auto in pista: " + data.numCars);
                                 Console.WriteLine("Auto: " + data.carModel);
                                 Console.WriteLine("Tracciato: " + data.track);
                                 Console.WriteLine("Nome Pilota: " + data.namePilot);
@@ -652,7 +652,6 @@ namespace CSharp_SampleApp
                     {
                         BinaryReader myReader = new BinaryReader(myStream);
 
-                        Console.WriteLine(start);
                         int mySleepMillis = 17;
                         int myPrevPacketId = 0;
 
@@ -672,17 +671,17 @@ namespace CSharp_SampleApp
 
                     String myOutput = String.Format("{1}{2:F3}{3:F3}{4:F3}{5}rpm:{6} sterzoangle: {7:F3}  (sleep: {0})",
                         aSleepMillis, aPacketId, aReader.ReadSingle(), aReader.ReadSingle(), aReader.ReadSingle(), aReader.ReadInt32(), aReader.ReadInt32(), aReader.ReadSingle());
-                    //Console.WriteLine(myOutput);
+                //Console.WriteLine(myOutput);
 
 
-                    //estrapolo gli rpm
-                    string[] rad0 = myOutput.ToString().Split(':');
+                //estrapolo gli rpm
+                string[] rad0 = myOutput.ToString().Split(':');
 
-                    //Console.WriteLine(rad0[1] + "rad0");
+                //Console.WriteLine(rad0[1] + "rad0");
 
-                    char[] radiant = new char[] { rad0[1][0], rad0[1][1], rad0[1][2], rad0[1][3] };
-                    string radiantsminut = new string(radiant);
-                // Console.WriteLine(radiantsminut);
+                char[] radiant = new char[] { rad0[1][0], rad0[1][1], rad0[1][2], rad0[1][3] };
+                string radiantsminut = new string(radiant);
+                //Console.WriteLine(radiantsminut);
                 //Console.WriteLine(RPM);
 
                 while (start == true)
@@ -704,6 +703,30 @@ namespace CSharp_SampleApp
                             case "amr_v8_vantage_gt3":
                                 RPMMax = 7000;
                                 break;
+                            case "audi_r8_lms":
+                                RPMMax = 7900;
+                                break;
+                            case "audi_r8_lms_evo":
+                                RPMMax = 7900;
+                                break;
+                            case "audi_r8_lms_evo_ii":
+                                RPMMax = 7900;
+                                break;
+                            case "bentley_continental_gt3_2016":
+                                RPMMax = 7000;
+                                break;
+                            case "bentley_continental_gt3_2018":
+                                RPMMax = 7250;
+                                break;
+                            case "bmw_m4_gt3":
+                                RPMMax = 6750;
+                                break;
+                            case "bmw_m6_gt3":
+                                RPMMax = 6280;
+                                break;
+                            case "jaguar_g3":
+                                RPMMax = 8100;
+                                break;
                             default:
                                 Console.WriteLine("non trovo gli RPMMax, contattare l'amministratore del programma");
                                 break;
@@ -711,11 +734,11 @@ namespace CSharp_SampleApp
                         }
                         //Console.WriteLine(start);
                         RPM = 0;
-                            RPM = int.Parse(radiantsminut);
-                        Console.WriteLine("l'auto è: " + auto + " e i giri max sono: " + RPMMax);
+                        RPM = int.Parse(radiantsminut);
+                        Console.WriteLine("l'auto è: " + auto + " e il limitatore è a: " + RPMMax + " rpm");
                         Console.WriteLine("Connesso e in azione");
-                            falseStart();
-                            //Console.WriteLine(start);
+                        falseStart();
+                        //Console.WriteLine(start);
 
                     }
                     catch (Exception)
@@ -733,7 +756,7 @@ namespace CSharp_SampleApp
                             Thread.Sleep(3000);
                             trueStart();
                             attempt++;
-                            Console.WriteLine("ho effettuato "+attempt+" tentativi");
+                            Console.WriteLine("ho effettuato "+attempt+" tentativi di connessione al gioco.");
                         }
                     } 
                     if (RPM!=0)
@@ -749,10 +772,10 @@ namespace CSharp_SampleApp
                         changeHighRpm();
                         ShowEffect1ChromaLink();
                         call = true;
-                        Thread.Sleep(1);
+                        //Thread.Sleep(1);
 
                     }
-                    //Console.WriteLine("condizione2= "+(call == true && c == false && RPM < 7200));
+                    
                     if ( c == false && RPM < RPMMax &&RPM>(RPMMax-400) && call==true)
                         {
                         
@@ -760,7 +783,7 @@ namespace CSharp_SampleApp
                         c = true;
                         changeOrangeRpm() ;
                         call = false;
-                        Thread.Sleep(1);
+                        //Thread.Sleep(1);
 
                     }
                     if (c == true && RPM<(RPMMax - 400) && RPM > (RPMMax - 4000) && call==false)
@@ -770,10 +793,10 @@ namespace CSharp_SampleApp
                         c = false;
                         changeGreenRpm();
                         call = true;
-                        Thread.Sleep(1);
+                        //Thread.Sleep(1);
 
                     }
-                    if (RPM < 4000)
+                    if (RPM < RPMMax-4000)
                     {
                         c = true;
                         changeLowRpm();
