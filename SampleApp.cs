@@ -10,6 +10,10 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 using static ChromaSDK.Keyboard;
+using CSharp_SampleApp.Refer;
+using static CSharp_SampleApp.Refer.DataRefer;
+using System.Drawing;
+
 
 namespace CSharp_SampleApp
 {
@@ -172,17 +176,8 @@ namespace CSharp_SampleApp
         public void ShowEffect1() //ex 45
 
         {
-            
-            //bool ok = true;
-            //while (ok) {
-                //ConsoleKeyInfo keyInfo = Console.ReadKey();
-
-                //if (keyInfo.Key == ConsoleKey.Escape) //blocca l'esecuzione
-                //{
-                //    break;
-                //}
-                
-                int[] keys = {
+                      
+        int[] keys = {
             (int)Keyboard.RZKEY.RZKEY_ESC,
             (int)Keyboard.RZKEY.RZKEY_OEM_1, //backslash \
             (int)Keyboard.RZKEY.RZKEY_TAB,
@@ -311,23 +306,24 @@ namespace CSharp_SampleApp
             }; //ordine accensione tastiera
                 int RPM=0;
                 int frameCount = 120;
-                int rpm = 0;
                 int attempt = 0;
+                bool a = true;
+                bool b = true;
                 bool c = true;
-                bool call=false;
+                bool d = true;
                 bool start;
-                int RPMMax=2;
+                int RPMMax=7000;
                 String MEMORY_LOCATION_PHYSICS = "Local\\acpmf_physics";
                 String MEMORY_LOCATION_STATIC = "Local\\acpmf_static";
+                String MEMORY_LOCATION_GRAPHICS = "Local\\acpmf_graphics";
                 var data = new MyStatic();
-                changeLowRpm();
+                var phisics =new MyPhysics();
+                var graphics =new myGraphics();
+            changeLowRpm();
                 mapFileStatic();
                 mapFilePhisics();
-                void changeRpm(int RPM1) {
-                    rpm = RPM1;
-                    
-                    Console.WriteLine("ciao"+rpm);
-                    
+                void showRpm(int rpm) {                    
+                    Console.WriteLine("ciao"+rpm);                    
                 }
                 //changeRpm(0);
                 void changeHighRpm()
@@ -406,8 +402,7 @@ namespace CSharp_SampleApp
                     ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
                 }
 
-
-                    void changeLowRpm()
+                void changeLowRpm()
                 {
                     //blocca il rosso su crhomalink
                     string baseLayerChromaLink = "Animations/Blank_ChromaLink.chroma";
@@ -475,8 +470,8 @@ namespace CSharp_SampleApp
                     //        ChromaAnimationAPI.OverrideFrameDurationName(baseLayer, 0.033f);
                     //        ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
 
-
                 }
+
                 void mapFilePhisics()
                 {
 
@@ -484,10 +479,11 @@ namespace CSharp_SampleApp
                     {
                         try
                         {
-                            using (MemoryMappedFile mmf = MemoryMappedFile.OpenExisting(MEMORY_LOCATION_PHYSICS))
+                            using (MemoryMappedFile mmp = MemoryMappedFile.OpenExisting(MEMORY_LOCATION_PHYSICS))
                             {
                             start = true;
-                            runStream(mmf);
+                            
+                            runStream(mmp);
                                 break;
                             }
                         }
@@ -645,7 +641,6 @@ namespace CSharp_SampleApp
                 } while (true);
             }
 
-
             void runStream(MemoryMappedFile aMemoryMappedFile)
                 {
                     using (MemoryMappedViewStream myStream = aMemoryMappedFile.CreateViewStream())
@@ -653,37 +648,176 @@ namespace CSharp_SampleApp
                         BinaryReader myReader = new BinaryReader(myStream);
 
                         int mySleepMillis = 17;
-                        int myPrevPacketId = 0;
+                        
 
                         while (true)
                         {
-                            int myPacketId = myReader.ReadInt32();
-                            singleReadAndWrite(myReader, myPacketId, mySleepMillis);
+                        using (var accessor = aMemoryMappedFile.CreateViewAccessor())
+                        {
 
-                            myPrevPacketId = myPacketId;
-                            myStream.Position = 0;
+                            accessor.Read(0, out phisics);
+                            //Console.WriteLine(phisics.rpm);
+                        }
+                        using (MemoryMappedFile mmg = MemoryMappedFile.OpenExisting(MEMORY_LOCATION_GRAPHICS))
+                        {
+                            using (var accessor2 = mmg.CreateViewAccessor())
+                            {
+                                graphics.PacketId = accessor2.ReadInt32(0);
+                                graphics.GameState = (GameStates)accessor2.ReadChar(4);
+                                graphics.Session = (SessionTypes)accessor2.ReadChar(8);
+                                graphics.CompletedLaps =accessor2.ReadInt32(132);
+                                graphics.Position =accessor2.ReadInt32(136);
+                                graphics.CurrentTimeMilliSeconds = accessor2.ReadInt32(140);
+                                graphics.LastTimeMilliSeconds = accessor2.ReadInt32(144);
+                                graphics.BestTimeMilliSeconds = accessor2.ReadInt32(148);
+                                graphics.TimeLeft = accessor2.ReadSingle(152);
+                                graphics.DistanceTravelled = accessor2.ReadSingle(156);
+                                graphics.IsInPit = accessor2.ReadInt32(160);
+                                graphics.CurrentSector = accessor2.ReadInt32(164);
+                                graphics.LastSectorTimeMilliSeconds = accessor2.ReadInt32(168);
+                                graphics.NumberOfCompletedLaps = accessor2.ReadInt32(172);
+                                graphics.ReplayTimeMultiplier = accessor2.ReadSingle(244);
+                                graphics.NormalizedCarPosition = accessor2.ReadSingle(248);
+                                graphics.ActiveCars = accessor2.ReadInt32(252);
+                                ////graphics.CarCoordinatesX = accessor2.ReadSingle(256);
+                                ////graphics.CarCoordinatesY = accessor2.ReadSingle(260);
+                                ////graphics.CarCoordinatesY = accessor2.ReadSingle(264);
+                                graphics.CarId = accessor2.ReadInt32(1216);
+                                graphics.PenaltyTime = accessor2.ReadSingle(1220);
+                                graphics.Flag = (FlagTypes)accessor2.ReadChar(1224);
+                                graphics.Penalty =(PenaltyTypes)accessor2.ReadChar(1228);
+                                graphics.IdealLineOn = accessor2.ReadInt32(1232);
+                                graphics.IsInPitLane = accessor2.ReadInt32(1236);
+                                graphics.SurfaceGrip = accessor2.ReadSingle(1240);
+                                graphics.MandatoryPitDone = accessor2.ReadInt32(1244);
+                                graphics.WindSpeed = accessor2.ReadSingle(1248);
+                                graphics.WindDirection = accessor2.ReadSingle(1252);
+                                graphics.IsSetupMenuVisible = accessor2.ReadInt32(1256);
+                                graphics.MainDisplayIndex = accessor2.ReadInt32(1260);
+                                graphics.SecondaryDisplayIndex=accessor2.ReadInt32(1264);
+                                graphics.TC=accessor2.ReadInt32(1268);
+                                graphics.TCUT=accessor2.ReadInt32(1272);
+                                graphics.EngineMap=accessor2.ReadInt32(1276);
+                                graphics.ABS=accessor2.ReadInt32(1280);
+                                graphics.FuelXLap=accessor2.ReadSingle(1284);
+                                graphics.RainLights=accessor2.ReadInt32(1288);
+                                graphics.FlashingLights=accessor2.ReadInt32(1292);
+                                graphics.LightsStage=accessor2.ReadInt32(1296);
+                                graphics.ExhaustTemperature=accessor2.ReadSingle(1300);
+                                graphics.WiperLV=accessor2.ReadInt32(1304);
+                                graphics.DriverStingTotalTimeLeft=accessor2.ReadInt32(1308);
+                                graphics.DriverStingTimeLeft=accessor2.ReadInt32(1312);
+                                graphics.RainTyres=accessor2.ReadInt32(1316);
+                                graphics.SessionIndex=accessor2.ReadInt32(1320);
+                                graphics.UsedFuel = accessor2.ReadSingle(1324);
+                                graphics.DeltaLapTimeInMilliSeconds = accessor2.ReadInt32(1358);
+                                graphics.EstimatedLapTimeInMilliSeconds = accessor2.ReadInt32(1392);
+                                graphics.IsDeltaPositive = accessor2.ReadInt32(1400);
+                                graphics.Isplit= accessor2.ReadInt32(1404);
+                                graphics.IsValidLap= accessor2.ReadInt32(1408);
+                                graphics.FuelEstimatedLaps = accessor2.ReadSingle(1412);
+                                graphics.MissingMandatoryPits= accessor2.ReadInt32(1484);
+                                graphics.Clock = accessor2.ReadSingle(1488);
+                                graphics.DirectionLightsLeft = accessor2.ReadInt32(1492);
+                                graphics.DirectionLightsRight = accessor2.ReadInt32(1496);
+                                graphics.GlobalYellow = accessor2.ReadInt32(1500);
+                                graphics.GlobalYellow1 = accessor2.ReadInt32(1504);
+                                graphics.GlobalYellow2 = accessor2.ReadInt32(1508);
+                                graphics.GlobalYellow3 = accessor2.ReadInt32(1512);
+                                graphics.GlobalWhite = accessor2.ReadInt32(1516);
+                                graphics.GlobalGreen = accessor2.ReadInt32(1520);
+                                graphics.GlobalChequered = accessor2.ReadInt32(1524);
+                                graphics.GlobalRed = accessor2.ReadInt32(1528);
+                                graphics.mfdTyreSet = accessor2.ReadInt32(1532);
+                                graphics.mfdFuelAdd = accessor2.ReadSingle(1536);
+                                graphics.mfdTyrePressureLF = accessor2.ReadSingle(1540);
+                                graphics.mfdTyrePressureRF = accessor2.ReadSingle(1544);
+                                graphics.mfdTyrePressureLR = accessor2.ReadSingle(1548);
+                                graphics.mfdTyrePressureRR = accessor2.ReadSingle(1552);
+                                graphics.GripStatus = (GripStatus)accessor2.ReadChar(1556);
+                                graphics.RainIntensity = (RainIntensity)accessor2.ReadChar(1560);
+                                graphics.RainIntensity10 = (RainIntensity)accessor2.ReadChar(1564);
+                                graphics.RainIntensity30 = (RainIntensity)accessor2.ReadChar(1568);
+                                graphics.CurrentTyreSet = accessor2.ReadInt32(1572);
+                                graphics.StrategyTyreSet = accessor2.ReadInt32(1576);
+                                graphics.GapAhead = accessor2.ReadInt32(1580);
+                                graphics.GapBehind = accessor2.ReadInt32(1584);
+
+
+
+                                //;
+                                //
+                                //graphics.Penalty = (PenaltyTypes)accessor2.ReadChar(1245);
+
+
+                                var CurrentTime = new char[15];
+                                var LastTime = new char[15];
+                                var BestTime = new char[15];
+                                var Split = new char[15];
+                                var TyreCompound = new char[33];
+                                var carCoordinatesReadX= new float[3];
+                                var carCoordinatesReadY= new float[3];
+                                var carCoordinatesReadZ= new float[3];
+                                var CarIds = new int[60];
+                                var DeltaLapTime = new char[15];
+                                var EstimatedLapTime = new char[15];
+                                var TrackStatus = new char[33];
+
+                                accessor2.ReadArray(12, CurrentTime, 0, 15);
+                                accessor2.ReadArray(42, LastTime, 0, 15);
+                                accessor2.ReadArray(72, BestTime, 0, 15);
+                                accessor2.ReadArray(102, Split, 0, 15);
+                                accessor2.ReadArray(176, TyreCompound, 0, 33);
+                                accessor2.ReadArray(1328, DeltaLapTime, 0, 15);
+                                accessor2.ReadArray(1362 , EstimatedLapTime,0, 15);
+                                accessor2.ReadArray(1416 , TrackStatus,0, 33);
+
+                                //accessor2.ReadArray(256, carCoordinatesReadX, 0, 3);
+                                //accessor2.ReadArray(260, carCoordinatesReadY, 0, 3);
+                                //accessor2.ReadArray(264, carCoordinatesReadZ, 0, 3);
+                                //accessor2.ReadArray(976, CarIds, 0, 60);
+
+                                graphics.CurrentTime = new string(CurrentTime);
+                                graphics.LastTime = new string(LastTime);
+                                graphics.BestTime = new string(BestTime);
+                                graphics.Split = new string(Split);
+                                graphics.TyreCompound= new string(TyreCompound);
+                                graphics.DeltaLapTime = new string(DeltaLapTime);
+                                graphics.EstimatedLapTime = new string(EstimatedLapTime);
+                                //graphics.CarCoordinatesX = carCoordinatesReadX;
+                                //graphics.CarCoordinatesY = carCoordinatesReadY;
+                                //graphics.CarCoordinatesZ = carCoordinatesReadZ;
+                                //graphics.CarIds = CarIds;
+
+
+                                //foreach (var item in (graphics.CarCoordinatesY))
+                                //{
+                                //    Console.Write(item);
+                                //}
+                                //Console.WriteLine(" ");
+                                //foreach (var item in (graphics.CarIds))
+                                //{
+                                //    Console.Write(item);
+                                //}
+
+                                //for (int i = 252; i < 1500; i=i+4)
+                                //{
+                                //    Console.Write("l'id è: " + i + "il valore: ");
+                                //    Console.WriteLine(accessor2.ReadInt32(i));
+
+                                //}
+                                Console.WriteLine(graphics.LastTimeMilliSeconds);
+                            }
+                        }
+
+                        singleReadAndWrite();
+
                             Thread.Sleep(mySleepMillis);
                         }
                     }
                 }
-                void singleReadAndWrite(BinaryReader aReader, int aPacketId, int aSleepMillis)
+                void singleReadAndWrite()
                 {
-
-                    String myOutput = String.Format("{1}{2:F3}{3:F3}{4:F3}{5}rpm:{6} sterzoangle: {7:F3}  (sleep: {0})",
-                        aSleepMillis, aPacketId, aReader.ReadSingle(), aReader.ReadSingle(), aReader.ReadSingle(), aReader.ReadInt32(), aReader.ReadInt32(), aReader.ReadSingle());
-                //Console.WriteLine(myOutput);
-
-
-                //estrapolo gli rpm
-                string[] rad0 = myOutput.ToString().Split(':');
-
-                //Console.WriteLine(rad0[1] + "rad0");
-
-                char[] radiant = new char[] { rad0[1][0], rad0[1][1], rad0[1][2], rad0[1][3] };
-                string radiantsminut = new string(radiant);
-                //Console.WriteLine(radiantsminut);
-                //Console.WriteLine(RPM);
-
                 while (start == true)
                 {
                         try
@@ -691,12 +825,6 @@ namespace CSharp_SampleApp
                         string auto = Regex.Replace(data.carModel, "[^a-zA-Z0-9_]", "");
                         switch (auto)
                         {
-                            case "ferrari_488_gt3":
-                                RPMMax = 7100;
-                                break;
-                            case "ferrari_296_gt3":
-                                RPMMax = 7200;
-                                break;
                             case "amr_v12_vantage_gt3":
                                 RPMMax = 7600;
                                 break;
@@ -727,6 +855,114 @@ namespace CSharp_SampleApp
                             case "jaguar_g3":
                                 RPMMax = 8100;
                                 break;
+                            case "ferrari_296_gt3":
+                                RPMMax = 7200;
+                                break;
+                            case "ferrari_488_gt3":
+                                RPMMax = 7100;
+                                break;
+                            case "ferrari_488_gt3_evo":
+                                RPMMax = 7100;
+                                break;
+                            case "honda_nsx_gt3":
+                                RPMMax = 7100;
+                                break;
+                            case "honda_nsx_gt3_evo":
+                                RPMMax = 7000;
+                                break;
+                            case "lamborghini_huracan_gt3":
+                                RPMMax = 7900;
+                                break;
+                            case "lamborghini_huracan_gt3_evo":
+                                RPMMax = 7900;
+                                break;
+                            case "lamborghini_huracan_gt3_evo2":
+                                RPMMax = 7900;
+                                break;
+                            case "lexus_rc_f_gt3":
+                                RPMMax = 7250;
+                                break;
+                            case "mclaren_650s_gt3":
+                                RPMMax = 7000;
+                                break;
+                            case "mclaren_720s_gt3":
+                                RPMMax = 7400;
+                                break;
+                            case "mclaren_720s_gt3_evo":
+                                RPMMax = 7300;
+                                break;
+                            case "mercedes_amg_gt3":
+                                RPMMax = 7100;
+                                break;
+                            case "mercedes_amg_gt3_evo":
+                                RPMMax = 7100;
+                                break;
+                            case "nissan_gt_r_gt3_2017":
+                                RPMMax = 7200;
+                                break;
+                            case "nissan_gt_r_gt3_2018":
+                                RPMMax = 7000;
+                                break;
+                            case "porsche_991_gt3_r":
+                                RPMMax = 9000;
+                                break;
+                            case "porsche_991ii_gt3_r":
+                                RPMMax = 9000;
+                                break;
+                            case "porsche_992_gt3_r":
+                                RPMMax = 9000;
+                                break;
+                            case "lamborghini_gallardo_rex":
+                                RPMMax = 8200;
+                                break;
+                            case "alpine_a110_gt4":
+                                RPMMax = 6300;
+                                break;
+                            case "amr_v8_vantage_gt4":
+                                RPMMax = 6800;
+                                break;
+                            case "bmw_m4_gt4":
+                                RPMMax = 7000;
+                                break;
+                            case "chevrolet_camaro_gt4r":
+                                RPMMax = 7000;
+                                break;
+                            case "ginetta_g55_gt4":
+                                RPMMax = 7000;
+                                break;
+                            case "ktm_xbow_gt4":
+                                RPMMax = 6300;
+                                break;
+                            case "maserati_mc_gt4":
+                                RPMMax = 6800;
+                                break;
+                            case "mclaren_570s_gt4":
+                                RPMMax = 7400;
+                                break;
+                            case "mercedes_amg_gt4":
+                                RPMMax = 6800;
+                                break;
+                            case "porsche_718_cayman_gt4_mr":
+                                RPMMax = 7600;
+                                break;
+                            case "porsche_991ii_gt3_cup":
+                                RPMMax = 8300;
+                                break;
+                            case "porsche_992_gt3_cup":
+                                RPMMax = 8300;
+                                break;
+                            case "lamborghini_huracan_st":
+                                RPMMax = 7900;
+                                break;
+                            case "lamborghini_huracan_st_evo2":
+                                RPMMax = 7900;
+                                break;
+                            case "ferrari_488_challenge_evo":
+                                RPMMax = 7100;
+                                break;
+                            case "bmw_m2_cs_racing":
+                                RPMMax = 7000;
+                                break;
                             default:
                                 Console.WriteLine("non trovo gli RPMMax, contattare l'amministratore del programma");
                                 break;
@@ -734,8 +970,9 @@ namespace CSharp_SampleApp
                         }
                         //Console.WriteLine(start);
                         RPM = 0;
-                        RPM = int.Parse(radiantsminut);
-                        Console.WriteLine("l'auto è: " + auto + " e il limitatore è a: " + RPMMax + " rpm");
+                        //RPM = int.Parse(radiantsminut);
+                        RPM=phisics.rpm;
+                        Console.WriteLine("L'auto è: " + auto + " e il limitatore è a: " + RPMMax + " rpm");
                         Console.WriteLine("Connesso e in azione");
                         falseStart();
                         //Console.WriteLine(start);
@@ -752,6 +989,7 @@ namespace CSharp_SampleApp
                                 mapFilePhisics();
                             }
                             RPM = 0;
+                            RPM = phisics.rpm;
                             Console.WriteLine("attesa avvio motore");
                             Thread.Sleep(3000);
                             trueStart();
@@ -759,51 +997,52 @@ namespace CSharp_SampleApp
                             Console.WriteLine("ho effettuato "+attempt+" tentativi di connessione al gioco.");
                         }
                     } 
-                    if (RPM!=0)
-                    {
-                        
-                        RPM = int.Parse(radiantsminut);
-                   
-                        if ( c == true && RPM >= RPMMax && call==false)
-                    {
+                        RPM=phisics.rpm;
+                        //Console.WriteLine(phisics.tyreTempFR);
 
-                        rpm = 7200;
-                        c = false;
+                    if ( d == true && RPM >= RPMMax)
+                        {
+                        a = true;
+                        b = true;
+                        c = true;
+                        d = false;
                         changeHighRpm();
                         ShowEffect1ChromaLink();
-                        call = true;
                         //Thread.Sleep(1);
 
                     }
                     
-                    if ( c == false && RPM < RPMMax &&RPM>(RPMMax-400) && call==true)
+                    if ( c == true && RPM < RPMMax && RPM > (RPMMax-400))
                         {
-                        
-                        rpm = RPM;
-                        c = true;
-                        changeOrangeRpm() ;
-                        call = false;
-                        //Thread.Sleep(1);
 
-                    }
-                    if (c == true && RPM<(RPMMax - 400) && RPM > (RPMMax - 4000) && call==false)
-                    {
-
-                        rpm = RPM;
+                        a = true;
+                        b = true;
                         c = false;
-                        changeGreenRpm();
-                        call = true;
+                        d = true;
+                        changeOrangeRpm() ;
                         //Thread.Sleep(1);
 
                     }
-                    if (RPM < RPMMax-4000)
+                    if (b == true && RPM<(RPMMax - 400) && RPM > (RPMMax - 4000))
                     {
+                        a = true;
+                        b = false;
                         c = true;
+                        d = true;
+                        changeGreenRpm();
+                        //Thread.Sleep(1);
+
+                    }
+                    if (a == true && RPM < RPMMax-4000)
+                    {
+                        a = false;
+                        b = true;
+                        c = true;
+                        d = true;
                         changeLowRpm();
-                        call = false;
                     }
-                   
-                    }
+                    //showRpm(RPM);
+                    
 
                 }
             void falseStart()
@@ -914,62 +1153,7 @@ namespace CSharp_SampleApp
         #endregion
     }
 
-    public struct MyStatic
-    {
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 15)]
-        public string sharedMemoryVersion;
+    
 
-        public string accVersion;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 1)]
-        public int numberSessions;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 1)]
-        public int numCars;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)]
-        public string carModel;
-        public string track;
-        public string namePilot;
-        public string surnamePilot;
-        public string nicknamePilot;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 1)]
-        public int sectorCount;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 1)]
-        public float maxTorque;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 1)]
-        public float maxPower;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 1)]
-        public int maxRpm;
-        public float maxFuel;
-        public float suspensionMaxTravel;// [4]
-        public float tyreRadius;//[4]
-        public float maxTurboBoost;
-        public float deprecated1;
-        public float deprecated2;
-        public int penaltiesEnabled;
-        public float aidFuelrate;
-        public float aidTyreRate;
-        public float aidMechanicalDamage;
-        public float AllowTyreBlankets;
-        public float aidStability;
-        public int aidAutoclutch;
-        public int aidAutoBlip;
-        public int hasDRS;//Not used in ACC
-        public int hasERS; //Not used in ACC
-        public int hasKERS;//Not used in ACC
-        public float kersMaxJ; //Not used in ACC
-        public int engineBrakeSettingsCount;//Not used in ACC
-        public int ersPowerControllerCount;//Not used in ACC
-        public float trackSplineLength;//Not used in ACC
-        public string trackConfiguration;//Not used in ACC
-        public float ersMaxJ;//Not used in ACC
-        public int isTimedRace;//Not used in ACC
-        public int hasExtraLap;//Not used in ACC
-        public string carSkin;//[33]Not used in ACC
-        public int reversedGridPositions;//Not used in ACC
-        public int PitWindowStart;//Pit window opening time
-        public int PitWindowEnd;//Pit windows closing time
-        public int isOnline;//If is a multiplayer session
-        public string dryTyresName;//[33]Name of the dry tyres
-        public string wetTyresName;//[33]Name of the wet tyres
-
-    }
+    
 }
