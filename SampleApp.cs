@@ -10,15 +10,17 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 using static ChromaSDK.Keyboard;
-using CSharp_SampleApp.Refer;
+using static CSharp_SampleApp.Refer.Excel;
 using static CSharp_SampleApp.Refer.DataRefer;
 using System.Drawing;
+using CSharp_SampleApp.Refer;
 
 
 namespace CSharp_SampleApp
 {
     public class SampleApp
     {
+
         private int _mResult = 0;
         private Random _mRandom = new Random();
 
@@ -175,9 +177,8 @@ namespace CSharp_SampleApp
 
         public void ShowEffect1() //ex 45
 
-        {
-                      
-        int[] keys = {
+        { 
+            int[] keys = {
             (int)Keyboard.RZKEY.RZKEY_ESC,
             (int)Keyboard.RZKEY.RZKEY_OEM_1, //backslash \
             (int)Keyboard.RZKEY.RZKEY_TAB,
@@ -304,197 +305,208 @@ namespace CSharp_SampleApp
             //(int)Keyboard.RZKEY.RZKEY_INVALID,
 
             }; //ordine accensione tastiera
-                int RPM=0;
-                int frameCount = 120;
-                int attempt = 0;
-                bool a = true;
-                bool b = true;
-                bool c = true;
-                bool d = true;
-                bool start;
-                int RPMMax=7000;
-                String MEMORY_LOCATION_PHYSICS = "Local\\acpmf_physics";
-                String MEMORY_LOCATION_STATIC = "Local\\acpmf_static";
-                String MEMORY_LOCATION_GRAPHICS = "Local\\acpmf_graphics";
-                var data = new MyStatic();
-                var phisics =new MyPhysics();
-                var graphics =new myGraphics();
+            int RPM=0;
+            int frameCount = 120;
+            int attempt = 0;
+            bool a = true;
+            bool b = true;
+            bool c = true;
+            bool d = true;
+            bool p = true;
+            bool w = true;
+            bool s = false;
+            bool start;
+            int RPMMax=7000;
+            String MEMORY_LOCATION_PHYSICS = "Local\\acpmf_physics";
+            String MEMORY_LOCATION_STATIC = "Local\\acpmf_static";
+            String MEMORY_LOCATION_GRAPHICS = "Local\\acpmf_graphics";
+            var data = new MyStatic();
+            var phisics =new MyPhysics();
+            var graphics =new myGraphics();
             changeLowRpm();
-                mapFileStatic();
-                mapFilePhisics();
-                void showRpm(int rpm) {                    
-                    Console.WriteLine("ciao"+rpm);                    
-                }
-                //changeRpm(0);
-                void changeHighRpm()
-                {
+            mapFileStatic();
+            string path = "";
+            Excel excel = new Excel();
+            excel.CreateNewFile();
+            int LastSectorTime = 0;
+            int sector3 = 0;
+            int split;
+            mapFilePhisics();
+           
+
+            void showRpm(int rpm) {                    
+                Console.WriteLine("ciao"+rpm);                    
+            }
+            //changeRpm(0);
+            void changeHighRpm()
+            {
                     
-                        string baseLayer = "Animations/Blank_Keyboard.chroma";
-                    // close the blank animation if it's already loaded, discarding any changes
-                        ChromaAnimationAPI.CloseAnimationName(baseLayer);
-                        // open the blank animation, passing a reference to the base animation when loading has completed
-                        ChromaAnimationAPI.GetAnimation(baseLayer);
-                        // the length of the animation
-                        frameCount = 6;
-                        // set all frames to white, with all frames set to 30FPS
-                        ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayer, frameCount, 0.016f, 255, 0, 0);
-                        // fade the start of the animation starting at frame zero to 40
-                        ChromaAnimationAPI.FadeStartFramesName(baseLayer, 5);
-                        // play the animation on the dynamic canvas
-                        ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
-
-
-                    //animazione originale
-                    // start with a blank animation
-                    //string baseLayer = "Animations/Blank_ChromaLink.chroma";
-                    //// close the blank animation if it's already loaded, discarding any changes
-                    //ChromaAnimationAPI.CloseAnimationName(baseLayer);
-                    //// open the blank animation, passing a reference to the base animation when loading has completed
-                    //ChromaAnimationAPI.GetAnimation(baseLayer);
-                    //// the length of the animation
-                    //int frameCount = 50;
-                    //// set all frames to white, with all frames set to 30FPS
-                    //ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayer, frameCount, 0.033f, 255, 255, 255);
-                    //// fade the start of the animation starting at frame zero to 40
-                    //ChromaAnimationAPI.FadeStartFramesName(baseLayer, 40);
-                    //// play the animation on the dynamic canvas
-                    //ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
-
-
-                }
-
-                void changeOrangeRpm()
-                {
-                    //blocca il rosso su crhomalink
-                    string baseLayerChromaLink = "Animations/Blank_ChromaLink.chroma";
-                    ChromaAnimationAPI.CloseAnimationName(baseLayerChromaLink);
-                    ChromaAnimationAPI.GetAnimation(baseLayerChromaLink);
-                    // set all frames to Orange, with all frames
-                    ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayerChromaLink, frameCount, 0f, 255, 60, 0);
-                    // play the animation on the dynamic canvas
-                    ChromaAnimationAPI.PlayAnimationName(baseLayerChromaLink, true);
-
                     string baseLayer = "Animations/Blank_Keyboard.chroma";
+                // close the blank animation if it's already loaded, discarding any changes
                     ChromaAnimationAPI.CloseAnimationName(baseLayer);
+                    // open the blank animation, passing a reference to the base animation when loading has completed
                     ChromaAnimationAPI.GetAnimation(baseLayer);
-                    ChromaAnimationAPI.SetKeysColorAllFramesRGBName(baseLayer, keys, keys.Length, 255, 60, 0);
-                    ChromaAnimationAPI.SetChromaCustomColorAllFramesName(baseLayer);
-                    ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
-
-                }
-
-                void changeGreenRpm()
-                {
-                    //blocca il rosso su crhomalink
-                    string baseLayerChromaLink = "Animations/Blank_ChromaLink.chroma";
-                    ChromaAnimationAPI.CloseAnimationName(baseLayerChromaLink);
-                    ChromaAnimationAPI.GetAnimation(baseLayerChromaLink);
-                    // set all frames to green, with all frames
-                    ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayerChromaLink, frameCount, 0f, 0, 125,0 );
+                    // the length of the animation
+                    frameCount = 6;
+                    // set all frames to white, with all frames set to 30FPS
+                    ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayer, frameCount, 0.016f, 255, 0, 0);
+                    // fade the start of the animation starting at frame zero to 40
+                    ChromaAnimationAPI.FadeStartFramesName(baseLayer, 5);
                     // play the animation on the dynamic canvas
-                    ChromaAnimationAPI.PlayAnimationName(baseLayerChromaLink, true);
-
-                    string baseLayer = "Animations/Blank_Keyboard.chroma";
-                    ChromaAnimationAPI.CloseAnimationName(baseLayer);
-                    ChromaAnimationAPI.GetAnimation(baseLayer);
-                    ChromaAnimationAPI.SetKeysColorAllFramesRGBName(baseLayer, keys, keys.Length, 0, 125,0 );
-                    ChromaAnimationAPI.SetChromaCustomColorAllFramesName(baseLayer);
-                    ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
-                }
-
-                void changeLowRpm()
-                {
-                    //blocca il rosso su crhomalink
-                    string baseLayerChromaLink = "Animations/Blank_ChromaLink.chroma";
-                    ChromaAnimationAPI.CloseAnimationName(baseLayerChromaLink);
-                    ChromaAnimationAPI.GetAnimation(baseLayerChromaLink);
-                    // set all frames to blu, with all frames
-                    ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayerChromaLink, frameCount, 0f, 0, 0,125);
-                    // play the animation on the dynamic canvas
-                    ChromaAnimationAPI.PlayAnimationName(baseLayerChromaLink, true);
-
-                    string baseLayer = "Animations/Blank_Keyboard.chroma";
-                    ChromaAnimationAPI.CloseAnimationName(baseLayer);
-                    ChromaAnimationAPI.GetAnimation(baseLayer);
-                    ChromaAnimationAPI.SetKeysColorAllFramesRGBName(baseLayer, keys, keys.Length, 0,0,125);
-                    ChromaAnimationAPI.SetChromaCustomColorAllFramesName(baseLayer);
                     ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
 
 
-                    //animazione originale 45
+                //animazione originale
+                // start with a blank animation
+                //string baseLayer = "Animations/Blank_ChromaLink.chroma";
+                //// close the blank animation if it's already loaded, discarding any changes
+                //ChromaAnimationAPI.CloseAnimationName(baseLayer);
+                //// open the blank animation, passing a reference to the base animation when loading has completed
+                //ChromaAnimationAPI.GetAnimation(baseLayer);
+                //// the length of the animation
+                //int frameCount = 50;
+                //// set all frames to white, with all frames set to 30FPS
+                //ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayer, frameCount, 0.033f, 255, 255, 255);
+                //// fade the start of the animation starting at frame zero to 40
+                //ChromaAnimationAPI.FadeStartFramesName(baseLayer, 40);
+                //// play the animation on the dynamic canvas
+                //ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
 
-                    //        string baseLayer = "Animations/Blank_Keyboard.chroma";
-                    //        ChromaAnimationAPI.CloseAnimationName(baseLayer);
-                    //        ChromaAnimationAPI.GetAnimation(baseLayer);
-                    //        int frameCount = 120;
-                    //        ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayer, frameCount, 0.1f, 64, 64, 64);
-                    //        int[] keys = {
-                    //    (int)Keyboard.RZKEY.RZKEY_W,
-                    //    (int)Keyboard.RZKEY.RZKEY_A,
-                    //    (int)Keyboard.RZKEY.RZKEY_S,
-                    //    (int)Keyboard.RZKEY.RZKEY_D,
-                    //};
-                    //        ChromaAnimationAPI.SetKeysColorAllFramesRGBName(baseLayer, keys, keys.Length, 255, 255, 0);
-                    //        keys = new int[] {
-                    //    (int)Keyboard.RZKEY.RZKEY_F1,
-                    //    (int)Keyboard.RZKEY.RZKEY_F2,
-                    //    (int)Keyboard.RZKEY.RZKEY_F3,
-                    //    (int)Keyboard.RZKEY.RZKEY_F4,
-                    //    (int)Keyboard.RZKEY.RZKEY_F5,
-                    //    (int)Keyboard.RZKEY.RZKEY_F6,
-                    //};
-                    //        float t = 0;
-                    //        float speed = 0.05f;
-                    //        for (int frameId = 0; frameId < frameCount; ++frameId)
-                    //        {
-                    //            t += speed;
-                    //            float hp = (float)Math.Abs(Math.Cos(Math.PI / 2.0f + t));
-                    //            for (int i = 0; i < keys.Length; ++i)
-                    //            {
-                    //                float ratio = (i + 1) / keys.Length;
-                    //                int color = ChromaAnimationAPI.GetRGB(0, (int)(255 * (1 - hp)), 0);
-                    //                if ((i + 1) / (float)(keys.Length + 1) < hp)
-                    //                {
-                    //                    color = ChromaAnimationAPI.GetRGB(0, 255, 0);
-                    //                }
-                    //                else
-                    //                {
-                    //                    color = ChromaAnimationAPI.GetRGB(0, 100, 0);
-                    //                }
-                    //                int key = keys[i];
-                    //                ChromaAnimationAPI.SetKeyColorName(baseLayer, frameId, key, color);
-                    //            }
-                    //        }
-                    //        ChromaAnimationAPI.SetChromaCustomFlagName(baseLayer, true);
-                    //        ChromaAnimationAPI.SetChromaCustomColorAllFramesName(baseLayer);
-                    //        ChromaAnimationAPI.OverrideFrameDurationName(baseLayer, 0.033f);
-                    //        ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
 
-                }
+            }
 
-                void mapFilePhisics()
+            void changeOrangeRpm()
+            {
+                //blocca il rosso su crhomalink
+                string baseLayerChromaLink = "Animations/Blank_ChromaLink.chroma";
+                ChromaAnimationAPI.CloseAnimationName(baseLayerChromaLink);
+                ChromaAnimationAPI.GetAnimation(baseLayerChromaLink);
+                // set all frames to Orange, with all frames
+                ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayerChromaLink, frameCount, 0f, 255, 60, 0);
+                // play the animation on the dynamic canvas
+                ChromaAnimationAPI.PlayAnimationName(baseLayerChromaLink, true);
+
+                string baseLayer = "Animations/Blank_Keyboard.chroma";
+                ChromaAnimationAPI.CloseAnimationName(baseLayer);
+                ChromaAnimationAPI.GetAnimation(baseLayer);
+                ChromaAnimationAPI.SetKeysColorAllFramesRGBName(baseLayer, keys, keys.Length, 255, 60, 0);
+                ChromaAnimationAPI.SetChromaCustomColorAllFramesName(baseLayer);
+                ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
+
+            }
+
+            void changeGreenRpm()
+            {
+                //blocca il rosso su crhomalink
+                string baseLayerChromaLink = "Animations/Blank_ChromaLink.chroma";
+                ChromaAnimationAPI.CloseAnimationName(baseLayerChromaLink);
+                ChromaAnimationAPI.GetAnimation(baseLayerChromaLink);
+                // set all frames to green, with all frames
+                ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayerChromaLink, frameCount, 0f, 0, 125,0 );
+                // play the animation on the dynamic canvas
+                ChromaAnimationAPI.PlayAnimationName(baseLayerChromaLink, true);
+
+                string baseLayer = "Animations/Blank_Keyboard.chroma";
+                ChromaAnimationAPI.CloseAnimationName(baseLayer);
+                ChromaAnimationAPI.GetAnimation(baseLayer);
+                ChromaAnimationAPI.SetKeysColorAllFramesRGBName(baseLayer, keys, keys.Length, 0, 125,0 );
+                ChromaAnimationAPI.SetChromaCustomColorAllFramesName(baseLayer);
+                ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
+            }
+
+            void changeLowRpm()
+            {
+                //blocca il rosso su crhomalink
+                string baseLayerChromaLink = "Animations/Blank_ChromaLink.chroma";
+                ChromaAnimationAPI.CloseAnimationName(baseLayerChromaLink);
+                ChromaAnimationAPI.GetAnimation(baseLayerChromaLink);
+                // set all frames to blu, with all frames
+                ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayerChromaLink, frameCount, 0f, 0, 0,125);
+                // play the animation on the dynamic canvas
+                ChromaAnimationAPI.PlayAnimationName(baseLayerChromaLink, true);
+
+                string baseLayer = "Animations/Blank_Keyboard.chroma";
+                ChromaAnimationAPI.CloseAnimationName(baseLayer);
+                ChromaAnimationAPI.GetAnimation(baseLayer);
+                ChromaAnimationAPI.SetKeysColorAllFramesRGBName(baseLayer, keys, keys.Length, 0,0,125);
+                ChromaAnimationAPI.SetChromaCustomColorAllFramesName(baseLayer);
+                ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
+
+
+                //animazione originale 45
+
+                //        string baseLayer = "Animations/Blank_Keyboard.chroma";
+                //        ChromaAnimationAPI.CloseAnimationName(baseLayer);
+                //        ChromaAnimationAPI.GetAnimation(baseLayer);
+                //        int frameCount = 120;
+                //        ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayer, frameCount, 0.1f, 64, 64, 64);
+                //        int[] keys = {
+                //    (int)Keyboard.RZKEY.RZKEY_W,
+                //    (int)Keyboard.RZKEY.RZKEY_A,
+                //    (int)Keyboard.RZKEY.RZKEY_S,
+                //    (int)Keyboard.RZKEY.RZKEY_D,
+                //};
+                //        ChromaAnimationAPI.SetKeysColorAllFramesRGBName(baseLayer, keys, keys.Length, 255, 255, 0);
+                //        keys = new int[] {
+                //    (int)Keyboard.RZKEY.RZKEY_F1,
+                //    (int)Keyboard.RZKEY.RZKEY_F2,
+                //    (int)Keyboard.RZKEY.RZKEY_F3,
+                //    (int)Keyboard.RZKEY.RZKEY_F4,
+                //    (int)Keyboard.RZKEY.RZKEY_F5,
+                //    (int)Keyboard.RZKEY.RZKEY_F6,
+                //};
+                //        float t = 0;
+                //        float speed = 0.05f;
+                //        for (int frameId = 0; frameId < frameCount; ++frameId)
+                //        {
+                //            t += speed;
+                //            float hp = (float)Math.Abs(Math.Cos(Math.PI / 2.0f + t));
+                //            for (int i = 0; i < keys.Length; ++i)
+                //            {
+                //                float ratio = (i + 1) / keys.Length;
+                //                int color = ChromaAnimationAPI.GetRGB(0, (int)(255 * (1 - hp)), 0);
+                //                if ((i + 1) / (float)(keys.Length + 1) < hp)
+                //                {
+                //                    color = ChromaAnimationAPI.GetRGB(0, 255, 0);
+                //                }
+                //                else
+                //                {
+                //                    color = ChromaAnimationAPI.GetRGB(0, 100, 0);
+                //                }
+                //                int key = keys[i];
+                //                ChromaAnimationAPI.SetKeyColorName(baseLayer, frameId, key, color);
+                //            }
+                //        }
+                //        ChromaAnimationAPI.SetChromaCustomFlagName(baseLayer, true);
+                //        ChromaAnimationAPI.SetChromaCustomColorAllFramesName(baseLayer);
+                //        ChromaAnimationAPI.OverrideFrameDurationName(baseLayer, 0.033f);
+                //        ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
+
+            }
+
+            void mapFilePhisics()
+            {
+
+                do
                 {
-
-                    do
+                    try
                     {
-                        try
+                        using (MemoryMappedFile mmp = MemoryMappedFile.OpenExisting(MEMORY_LOCATION_PHYSICS))
                         {
-                            using (MemoryMappedFile mmp = MemoryMappedFile.OpenExisting(MEMORY_LOCATION_PHYSICS))
-                            {
-                            start = true;
+                        start = true;
                             
-                            runStream(mmp);
-                                break;
-                            }
+                        runStream(mmp);
+                            break;
                         }
-                        catch (Exception)
-                        {
+                    }
+                    catch (Exception)
+                    {
 
-                            Console.WriteLine("in attesa di connettersi al gioco");
-                            Thread.Sleep(10000);
-                        }
-                    } while (true);
-                }
+                        Console.WriteLine("in attesa di connettersi al gioco");
+                        Thread.Sleep(10000);
+                    }
+                } while (true);
+            }
 
 
             void mapFileStatic()
@@ -806,7 +818,8 @@ namespace CSharp_SampleApp
                                 //    Console.WriteLine(accessor2.ReadInt32(i));
 
                                 //}
-                                Console.WriteLine(graphics.LastTimeMilliSeconds);
+                                //Console.WriteLine(graphics.LastTimeMilliSeconds);
+                                //Console.WriteLine(graphics.GameState);
                             }
                         }
 
@@ -818,6 +831,7 @@ namespace CSharp_SampleApp
                 }
                 void singleReadAndWrite()
                 {
+                
                 while (start == true)
                 {
                         try
@@ -974,7 +988,9 @@ namespace CSharp_SampleApp
                         RPM=phisics.rpm;
                         Console.WriteLine("L'auto è: " + auto + " e il limitatore è a: " + RPMMax + " rpm");
                         Console.WriteLine("Connesso e in azione");
+                        s = true;
                         falseStart();
+                        
                         //Console.WriteLine(start);
 
                     }
@@ -994,13 +1010,54 @@ namespace CSharp_SampleApp
                             Thread.Sleep(3000);
                             trueStart();
                             attempt++;
+                            
                             Console.WriteLine("ho effettuato "+attempt+" tentativi di connessione al gioco.");
                         }
                     } 
                         RPM=phisics.rpm;
-                        //Console.WriteLine(phisics.tyreTempFR);
+                //Console.WriteLine(phisics.tyreTempFR);
 
-                    if ( d == true && RPM >= RPMMax)
+                //string path="";
+                
+
+                split = graphics.LastSectorTimeMilliSeconds;
+                //Console.WriteLine(split);
+
+                if ((graphics.GameState) != 0 && graphics.CurrentSector!=0 && split>LastSectorTime)
+                {
+                    Console.WriteLine($"Giro: {graphics.CompletedLaps} Settore: {graphics.CurrentSector}   {graphics.LastSectorTimeMilliSeconds}");
+
+                    excel.WriteToCell(graphics.CompletedLaps, (graphics.CurrentSector), ((split-LastSectorTime)).ToString());
+                    LastSectorTime = split;
+                    if (graphics.CurrentSector == 2)
+                    {
+                        sector3 = split;
+                    }
+
+
+                }
+                if ((graphics.GameState) != 0 && (graphics.CurrentSector) ==0 && (graphics.CompletedLaps)>0)
+                {   excel.WriteToCell((graphics.CompletedLaps - 1),0,"Lap: " + (graphics.CompletedLaps).ToString());
+                    excel.WriteToCell((graphics.CompletedLaps-1), 3, (graphics.LastTimeMilliSeconds-sector3).ToString());
+                    LastSectorTime = split;
+                }
+
+                if ((graphics.GameState) == 0 && s == true)
+                {
+                    DateTime dataOdierna = DateTime.Today;
+                    DateTime oraCorrente = DateTime.Now;
+                    string giorno = dataOdierna.ToString("dd_MM_yyyy");
+                    string ora = oraCorrente.ToString("HH_mm");
+                    string tracciato = Regex.Replace(data.track, "[^a-zA-Z0-9_]", "");
+                    path = $"{giorno}_{ora}_{graphics.Session}_{tracciato}_{data.carModel}";
+                    excel.SaveAs(path);
+                    excel.Close();
+                    s = false;
+                }
+
+
+
+                if ( d == true && RPM >= RPMMax)
                         {
                         a = true;
                         b = true;
@@ -1149,7 +1206,16 @@ namespace CSharp_SampleApp
             ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
         }
 
-        
+        void NewExcel(string path)
+        {
+            Excel newFile = new Excel();
+            newFile.CreateNewFile();
+            //newFile.CreateNewsheet(); //aggiunge una seconda tabella al nuvovo file
+            newFile.SaveAs(path);
+            newFile.Close();
+        }
+
+
         #endregion
     }
 

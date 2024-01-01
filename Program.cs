@@ -9,6 +9,7 @@ using System.Xml;
 
 
 using Microsoft.Office.Interop.Excel;
+using CSharp_SampleApp.Refer;
 
 namespace CSharp_SampleApp
 {
@@ -16,21 +17,12 @@ namespace CSharp_SampleApp
     {
 
 
-        XmlDocument doc = new XmlDocument();
-        XmlTextWriter writer = new XmlTextWriter("file.xml", null);
-
-        //writer.Formatting = Formatting.Indented;
-        //writer.WriteStartDocument();
-        //writer.WriteStartElement("root");
-        //writer.WriteStartElement("element");
-        //writer.WriteString("testo");
-        //writer.WriteEndElement();
-        //writer.WriteEndElement();
-        //writer.WriteEndDocument();
-        //writer.Close();
-        //doc.Save("file.xml");
+     
         static void Main(string[] args)
         {
+           
+
+
             SampleApp sampleApp = new SampleApp();
             sampleApp.Start();
            
@@ -45,7 +37,13 @@ namespace CSharp_SampleApp
                 sampleApp.ExecuteItem(selectedIndex, supportsStreaming, platform);
 
                 Thread.Sleep(1);                
-            }            
+            }
+
+
+
+
+            
+            
         }
     }
 }
