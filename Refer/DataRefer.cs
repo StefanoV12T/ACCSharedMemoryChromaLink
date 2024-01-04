@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Runtime.InteropServices;
 
-namespace CSharp_SampleApp.Refer
+namespace Telemetry_ACC_with_razer_Chroma.Refer
 {
     public class DataRefer
     {

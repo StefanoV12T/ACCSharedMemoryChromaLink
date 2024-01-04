@@ -10,16 +10,17 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 using static ChromaSDK.Keyboard;
-using static CSharp_SampleApp.Refer.Excel;
-using static CSharp_SampleApp.Refer.DataRefer;
+using static Telemetry_ACC_with_razer_Chroma.Refer.DataRefer;
 using System.Drawing;
-using CSharp_SampleApp.Refer;
+using Telemetry_ACC_with_razer_Chroma.Refer;
 
 
-namespace CSharp_SampleApp
+namespace Telemetry_ACC_with_razer_Chroma
 {
-    public class SampleApp
+
+    public class Telemetry
     {
+        static Excel excel = new Excel();
 
         private int _mResult = 0;
         private Random _mRandom = new Random();
@@ -326,10 +327,12 @@ namespace CSharp_SampleApp
             changeLowRpm();
             mapFileStatic();
             string path = "";
-            Excel excel = new Excel();
+            //Excel excel = new Excel();
             excel.CreateNewFile();
+           // excel.SaveAs("recovery.xlsx");
+            excel.Close();
             int LastSectorTime = 0;
-            int sector3 = 0;
+            int sector2 = 0;
             int split;
             mapFilePhisics();
            
@@ -755,13 +758,6 @@ namespace CSharp_SampleApp
                                 graphics.GapAhead = accessor2.ReadInt32(1580);
                                 graphics.GapBehind = accessor2.ReadInt32(1584);
 
-
-
-                                //;
-                                //
-                                //graphics.Penalty = (PenaltyTypes)accessor2.ReadChar(1245);
-
-
                                 var CurrentTime = new char[15];
                                 var LastTime = new char[15];
                                 var BestTime = new char[15];
@@ -1025,20 +1021,21 @@ namespace CSharp_SampleApp
 
                 if ((graphics.GameState) != 0 && graphics.CurrentSector!=0 && split>LastSectorTime)
                 {
-                    Console.WriteLine($"Giro: {graphics.CompletedLaps} Settore: {graphics.CurrentSector}   {graphics.LastSectorTimeMilliSeconds}");
+                    Console.WriteLine($"Giro: {graphics.CompletedLaps+1} Settore: {graphics.CurrentSector}   {graphics.LastSectorTimeMilliSeconds}");
 
                     excel.WriteToCell(graphics.CompletedLaps, (graphics.CurrentSector), ((split-LastSectorTime)).ToString());
                     LastSectorTime = split;
                     if (graphics.CurrentSector == 2)
                     {
-                        sector3 = split;
+                        sector2 = split;
                     }
 
 
                 }
                 if ((graphics.GameState) != 0 && (graphics.CurrentSector) ==0 && (graphics.CompletedLaps)>0)
                 {   excel.WriteToCell((graphics.CompletedLaps - 1),0,"Lap: " + (graphics.CompletedLaps).ToString());
-                    excel.WriteToCell((graphics.CompletedLaps-1), 3, (graphics.LastTimeMilliSeconds-sector3).ToString());
+                    excel.WriteToCell((graphics.CompletedLaps-1), 3, (graphics.LastTimeMilliSeconds-sector2).ToString());
+                    Console.WriteLine($"Giro: {graphics.CompletedLaps} Settore: 3   {graphics.LastTimeMilliSeconds-sector2}");
                     LastSectorTime = split;
                 }
 
@@ -1098,10 +1095,10 @@ namespace CSharp_SampleApp
                         d = true;
                         changeLowRpm();
                     }
-                    //showRpm(RPM);
+                //showRpm(RPM);
                     
 
-                }
+            }
             void falseStart()
             {
                 start = false;
@@ -1214,7 +1211,12 @@ namespace CSharp_SampleApp
             newFile.SaveAs(path);
             newFile.Close();
         }
-
+        public void CurrentDomain_ProcessExit()
+        {
+            excel.SaveAs("recovery.xlsx");
+            //excel.Save();
+            excel.Close();
+        }
 
         #endregion
     }

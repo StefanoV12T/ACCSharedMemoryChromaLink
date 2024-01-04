@@ -1,32 +1,24 @@
 ﻿using ChromaSDK;
+using Telemetry_ACC_with_razer_Chroma.Refer;
 using System;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 
-using System.Xml;
-
-
-using Microsoft.Office.Interop.Excel;
-using CSharp_SampleApp.Refer;
-
-namespace CSharp_SampleApp
+namespace Telemetry_ACC_with_razer_Chroma
 {
     class Program
     {
-
-
-     
+         
         static void Main(string[] args)
         {
            
-
-
-            SampleApp sampleApp = new SampleApp();
-            sampleApp.Start();
+            Telemetry telemetry = new Telemetry();
+            telemetry.Start();
            
-            if (sampleApp.GetInitResult() == RazerErrors.RZRESULT_SUCCESS)
+            if (telemetry.GetInitResult() == RazerErrors.RZRESULT_SUCCESS)
             {
                 bool supportsStreaming = ChromaAnimationAPI.CoreStreamSupportsStreaming();
 
@@ -34,16 +26,16 @@ namespace CSharp_SampleApp
 
                 byte platform = 0;
 
-                sampleApp.ExecuteItem(selectedIndex, supportsStreaming, platform);
+                telemetry.ExecuteItem(selectedIndex, supportsStreaming, platform);
 
-                Thread.Sleep(1);                
+                Thread.Sleep(1);
             }
-
-
-
-
             
-            
+           
+
+
+
+
         }
     }
 }
