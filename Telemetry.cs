@@ -17,15 +17,11 @@ using Telemetry_ACC_with_razer_Chroma.Refer;
 
 namespace Telemetry_ACC_with_razer_Chroma
 {
-
     public class Telemetry
     {
         static Excel excel = new Excel();
-        static bool ChromaON;
-        
-    
-    static int _mResult;        
-
+        static bool ChromaON;  
+        static int _mResult; 
         public void Start()
         {
             if (ChromaON)
@@ -162,68 +158,34 @@ namespace Telemetry_ACC_with_razer_Chroma
             (int)Keyboard.RZKEY.RZKEY_KOR_6,
             (int)Keyboard.RZKEY.RZKEY_KOR_7,
             //(int)Keyboard.RZKEY.RZKEY_INVALID,
-
             }; //ordine accensione tastiera
-
             int RPM = 0;
             int frameCount = 120;
             int attempt = 0;
+            int RPMMax = 7000;
+            int LastSectorTime = 0;
+            int sector2 = 0;
+            int split;
             bool a = true;
             bool b = true;
             bool c = true;
             bool d = true;
-            bool p = true;
+            bool changeSession = true;
             bool w = true;
             bool s = false;
             bool start;
-            int RPMMax = 7000;
             String MEMORY_LOCATION_PHYSICS = "Local\\acpmf_physics";
             String MEMORY_LOCATION_STATIC = "Local\\acpmf_static";
             String MEMORY_LOCATION_GRAPHICS = "Local\\acpmf_graphics";
             var data = new MyStatic();
             var phisics = new MyPhysics();
             var graphics = new myGraphics();
-            //changeLowRpm();
             mapFileStatic();
             string path = "";
-            excel.CreateNewFile();
-           
-            int LastSectorTime = 0;
-            int sector2 = 0;
-            int split;
+            string session="c";
+            excel.CreateNewFile();           
             mapFilePhisics();
-
-
-            void showRpm(int rpm)
-            {
-                Console.WriteLine("ciao" + rpm);
-            }
-
-            void mapFilePhisics()
-            {
-
-                do
-                {
-                    try
-                    {
-                        using (MemoryMappedFile mmp = MemoryMappedFile.OpenExisting(MEMORY_LOCATION_PHYSICS))
-                        {
-                            start = true;
-
-                            runStream(mmp);
-                            break;
-                        }
-                    }
-                    catch (Exception)
-                    {
-
-                        Console.WriteLine("in attesa di connettersi al gioco");
-                        Thread.Sleep(1000);
-                    }
-                } while (true);
-            }
-
-
+            
             void mapFileStatic()
             {
                 trueStart();
@@ -281,7 +243,6 @@ namespace Telemetry_ACC_with_razer_Chroma
                                 data.dryTyresName = "";//[33]Name of the dry tyres
                                 data.wetTyresName = "";//[33]Name of the wet tyres
 
-
                                 // Read the data from the accessor
                                 //accessor.Read(0, out data);
                                 var sharedMemoryVersion = new char[15];
@@ -297,7 +258,6 @@ namespace Telemetry_ACC_with_razer_Chroma
                                 var maxPower = accessor.ReadSingle(198);
                                 var maxRpm = accessor.ReadInt32(199);
                                 var maxFuel = accessor.ReadSingle(200);
-
 
                                 accessor.ReadArray(0, sharedMemoryVersion, 0, 15);
                                 accessor.ReadArray(30, accVersion, 0, 15);
@@ -319,8 +279,6 @@ namespace Telemetry_ACC_with_razer_Chroma
                                 data.dryTyresName = new string(dryTyresName);
                                 data.wetTyresName = new string(wetTyresName);
                                 //data.char5 = new string(char1);
-
-
 
                                 //accessor.Read(0, out data);
                                 // Write the data to the accessor
@@ -361,7 +319,6 @@ namespace Telemetry_ACC_with_razer_Chroma
                     }
                     catch (Exception)
                     {
-
                         Console.WriteLine("in attesa di leggere le statistiche del gioco");
                         Thread.Sleep(10000);
                     }
@@ -376,14 +333,11 @@ namespace Telemetry_ACC_with_razer_Chroma
 
                     int mySleepMillis = 17;
 
-
                     while (true)
                     {
                         using (var accessor = aMemoryMappedFile.CreateViewAccessor())
                         {
-
                             accessor.Read(0, out phisics);
-                            //Console.WriteLine(phisics.rpm);
                         }
                         using (MemoryMappedFile mmg = MemoryMappedFile.OpenExisting(MEMORY_LOCATION_GRAPHICS))
                         {
@@ -530,12 +484,34 @@ namespace Telemetry_ACC_with_razer_Chroma
                                 //Console.WriteLine(graphics.GameState);
                             }
                         }
-
                         singleReadAndWrite(); 
                         Thread.Sleep(mySleepMillis);
                     }
                 }
             }
+            void mapFilePhisics()
+            {
+                do
+                {
+                    try
+                    {
+                        using (MemoryMappedFile mmp = MemoryMappedFile.OpenExisting(MEMORY_LOCATION_PHYSICS))
+                        {
+                            start = true;
+
+                            runStream(mmp);
+                            break;
+                        }
+                    }
+                    catch (Exception)
+                    {
+
+                        Console.WriteLine("in attesa di connettersi al gioco");
+                        Thread.Sleep(1000);
+                    }
+                } while (true);
+            }
+
             void singleReadAndWrite()
             {
 
@@ -687,19 +663,12 @@ namespace Telemetry_ACC_with_razer_Chroma
                             default:
                                 Console.WriteLine("non trovo gli RPMMax, contattare l'amministratore del programma");
                                 break;
-
                         }
-                        //Console.WriteLine(start);
                         RPM = 0;
-                        //RPM = int.Parse(radiantsminut);
                         RPM = phisics.rpm;
                         Console.WriteLine("L'auto è: " + auto + " e il limitatore è a: " + RPMMax + " rpm");
                         Console.WriteLine("Connesso e in azione");
-                        s = true;
                         falseStart();
-
-                        //Console.WriteLine(start);
-
                     }
                     catch (Exception)
                     {
@@ -722,50 +691,75 @@ namespace Telemetry_ACC_with_razer_Chroma
                     }
                 }
                 RPM = phisics.rpm;
-                //Console.WriteLine(phisics.tyreTempFR);
-
-                //string path="";
-
-
                 split = graphics.LastSectorTimeMilliSeconds;
-                //Console.WriteLine(split);
-
+                               
                 if ((graphics.GameState) != 0 && graphics.CurrentSector != 0 && split > LastSectorTime)
                 {
                     Console.WriteLine($"Giro: {graphics.CompletedLaps + 1} Settore: {graphics.CurrentSector}   {graphics.LastSectorTimeMilliSeconds}");
-
-                    excel.WriteToCell(graphics.CompletedLaps, (graphics.CurrentSector), ((split - LastSectorTime)).ToString());
+                    //long millisecondi = 83234;
+                    //TimeSpan tempo = TimeSpan.FromMilliseconds(millisecondi);
+                    //string risultato = $"{tempo.Hours} ore, {tempo.Minutes} minuti, {tempo.Seconds} secondi e {tempo.Milliseconds} millisecondi";
+                    excel.WriteToCell(graphics.CompletedLaps+3, (graphics.CurrentSector), ((split - LastSectorTime)).ToString());
                     //Console.WriteLine("settore salvato in excel");
                     LastSectorTime = split;
                     if (graphics.CurrentSector == 2)
                     {
                         sector2 = split;
                     }
-
-
                 }
-                if ((graphics.GameState) != 0 && (graphics.CurrentSector) == 0 && (graphics.CompletedLaps) > 0)
-                {
-                    excel.WriteToCell((graphics.CompletedLaps - 1), 0, "Lap: " + (graphics.CompletedLaps).ToString());
-                    excel.WriteToCell((graphics.CompletedLaps - 1), 3, (graphics.LastTimeMilliSeconds - sector2).ToString());
+                if ((graphics.GameState) != 0 && (graphics.CurrentSector) == 0 && (graphics.CompletedLaps) > 0)//per provare
+                //if ((graphics.GameState) != 0 && (graphics.CurrentSector) == 0 && (graphics.CompletedLaps) > 0 &&LastSectorTime!=0)
+                    {
+                    Console.WriteLine(graphics.CompletedLaps);
+                    excel.WriteToCell((graphics.CompletedLaps +2), 0, "Lap: " + (graphics.CompletedLaps).ToString());
+                    excel.WriteToCell((graphics.CompletedLaps +2), 3, (graphics.LastTimeMilliSeconds - sector2).ToString());
                     Console.WriteLine($"Giro: {graphics.CompletedLaps} Settore: 3   {graphics.LastTimeMilliSeconds - sector2}");
                     LastSectorTime = split;
+                    Console.WriteLine(graphics.CompletedLaps);
+
                 }
 
-                if ((graphics.GameState) == 0 && s == true)
+                if ((graphics.GameState) == 0 && s == true )
                 {
                     DateTime dataOdierna = DateTime.Today;
                     DateTime oraCorrente = DateTime.Now;
                     string giorno = dataOdierna.ToString("dd_MM_yyyy");
-                    string ora = oraCorrente.ToString("HH_mm");
+                    string ora = oraCorrente.ToString("HH_mm_ss");
                     string tracciato = Regex.Replace(data.track, "[^a-zA-Z0-9_]", "");
-                    path = $"{giorno}_{ora}_{graphics.Session}_{tracciato}_{data.carModel}";
+                    path = $"{giorno}_{ora}_{session}_{tracciato}_{data.carModel}";
                     excel.SaveAs(path);
                     excel.Close();
+                    excel.CreateNewFile();
+                    Console.WriteLine("ho salvato da fine sessione");
                     s = false;
                 }
+                if (graphics.GameState != 0) 
+                {
+                s = true;
+                }
+                while (changeSession == true && graphics.GameState != 0)
+                {
+                    session = (graphics.Session).ToString();
+                    changeSession = false;
+                }
 
-               
+                if (session != (graphics.Session).ToString() && (graphics.GameState) != 0 && (excel.ReadCell(3,0))!="" )
+                {
+                    DateTime dataOdierna = DateTime.Today;
+                    DateTime oraCorrente = DateTime.Now;
+                    string giorno = dataOdierna.ToString("dd_MM_yyyy");
+                    string ora = oraCorrente.ToString("HH_mm_ss");
+                    string tracciato = Regex.Replace(data.track, "[^a-zA-Z0-9_]", "");
+                    path = $"{giorno}_{ora}_{session}_{tracciato}_{data.carModel}";
+                    excel.SaveAs(path);
+                    excel.Close();
+                    excel.CreateNewFile();
+                    Console.WriteLine(excel.ReadCell(3, 0));
+                    Console.WriteLine(graphics.GameState);
+                    Console.WriteLine("ho salvato e cambiato sessione");
+                    changeSession = true;
+                    s = true;
+                }
 
                 if (d == true && RPM >= RPMMax && ChromaON)
                 {
@@ -774,20 +768,15 @@ namespace Telemetry_ACC_with_razer_Chroma
                     c = true;
                     d = false;
                     changeHighRpm();
-                    //Thread.Sleep(1);
-
                 }
 
                 if (c == true && RPM < RPMMax && RPM > (RPMMax - 400) && ChromaON)
                 {
-
                     a = true;
                     b = true;
                     c = false;
                     d = true;
                     changeOrangeRpm();
-                    //Thread.Sleep(1);
-
                 }
                 if (b == true && RPM < (RPMMax - 400) && RPM > (RPMMax - 4000) && ChromaON)
                 {
@@ -796,8 +785,6 @@ namespace Telemetry_ACC_with_razer_Chroma
                     c = true;
                     d = true;
                     changeGreenRpm();
-                    //Thread.Sleep(1);
-
                 }
                 if (a == true && RPM < RPMMax - 4000 && ChromaON)
                 {
@@ -807,9 +794,6 @@ namespace Telemetry_ACC_with_razer_Chroma
                     d = true;
                     changeLowRpm();
                 }
-                //showRpm(RPM);
-
-
             }
             void falseStart()
             {
@@ -907,6 +891,10 @@ namespace Telemetry_ACC_with_razer_Chroma
 
             }
 
+            void showRpm()
+            {
+                Console.WriteLine(RPM);
+            }
             /////////////////
         }
         public void OnApplicationQuit()
@@ -926,22 +914,13 @@ namespace Telemetry_ACC_with_razer_Chroma
                 }
             }
         }
-
-        public string GetEffectName(int index, byte platform)
-        {
-            switch (index)
-            {
-                default:
-                    return string.Format("Effect{0}", index);
-            }
-        }
         public void Chroma_APPINFO()
         {
             ChromaSDK.APPINFOTYPE appInfo = new APPINFOTYPE();
-            appInfo.Title = "Razer Chroma test";
-            appInfo.Description = "A sample application using Razer Chroma SDK";
+            appInfo.Title = "Razer Chroma Telemetry";
+            appInfo.Description = "An application using Razer Chroma SDK";
 
-            appInfo.Author_Name = "Razer";
+            appInfo.Author_Name = "SC V12";
             appInfo.Author_Contact = "https://developer.razer.com/chroma";
 
             //appInfo.SupportedDevice = 
@@ -975,19 +954,6 @@ namespace Telemetry_ACC_with_razer_Chroma
        
 
         #region Autogenerated
-
-
-
-  
-
-       
-
-         
-
-        
-
-
-        
 
 
         void ShowEffect1Headset()

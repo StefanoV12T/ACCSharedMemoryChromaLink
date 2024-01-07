@@ -10,11 +10,10 @@ using System.Threading.Tasks;
 namespace Telemetry_ACC_with_razer_Chroma
 {
     class Program
-    {
-         
+    {  
         static void Main(string[] args)
         {
-            bool Chroma_On=false;
+            bool Chroma_On=true;
             Telemetry telemetry = new Telemetry();
             
             if (Chroma_On)
@@ -23,7 +22,7 @@ namespace Telemetry_ACC_with_razer_Chroma
                 telemetry.Chroma_APPINFO();
 
                 }
-            
+
             telemetry.Start();
         }
     }
