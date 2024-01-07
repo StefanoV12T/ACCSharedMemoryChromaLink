@@ -5299,11 +5299,11 @@ namespace ChromaSDK
 		/// </summary>
 		public static void SetKeysColorAllFramesRGBName(string path, int[] rzkeys, int keyCount, int red, int green, int blue)
 		{
-			string str_Path = path;
+            string str_Path = path;
 			IntPtr lp_Path = GetPathIntPtr(str_Path);
 			PluginSetKeysColorAllFramesRGBName(lp_Path, rzkeys, keyCount, red, green, blue);
 			FreeIntPtr(lp_Path);
-		}
+        }
 		/// <summary>
 		/// Set an array of animation keys to a static color for the given frame.
 		/// </summary>

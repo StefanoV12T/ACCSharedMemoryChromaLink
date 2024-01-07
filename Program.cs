@@ -14,28 +14,17 @@ namespace Telemetry_ACC_with_razer_Chroma
          
         static void Main(string[] args)
         {
-           
+            bool Chroma_On=false;
             Telemetry telemetry = new Telemetry();
-            telemetry.Start();
-           
-            if (telemetry.GetInitResult() == RazerErrors.RZRESULT_SUCCESS)
-            {
-                bool supportsStreaming = ChromaAnimationAPI.CoreStreamSupportsStreaming();
-
-                int selectedIndex = 1;
-
-                byte platform = 0;
-
-                telemetry.ExecuteItem(selectedIndex, supportsStreaming, platform);
-
-                Thread.Sleep(1);
-            }
             
-           
+            if (Chroma_On)
+                {
+                telemetry.ChromaOnTrue();
+                telemetry.Chroma_APPINFO();
 
-
-
-
+                }
+            
+            telemetry.Start();
         }
     }
 }

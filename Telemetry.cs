@@ -21,164 +21,22 @@ namespace Telemetry_ACC_with_razer_Chroma
     public class Telemetry
     {
         static Excel excel = new Excel();
-
-        private int _mResult = 0;
-        private Random _mRandom = new Random();
-
-        string _mShortcode = ChromaSDK.Stream.Default.Shortcode;
-        byte _mLenShortCode = 0;
-
-        string _mStreamId = ChromaSDK.Stream.Default.StreamId;
-        byte _mLenStreamId = 0;
-
-        string _mStreamKey = ChromaSDK.Stream.Default.StreamKey;
-        byte _mLenStreamKey = 0;
-
-        string _mStreamFocus = ChromaSDK.Stream.Default.StreamFocus;
-        byte _mLenStreamFocus = 0;
-        string _mStreamFocusGuid = "UnitTest-" + Guid.NewGuid();
-
-
-        public int GetInitResult()
-        {
-            return _mResult;
-        }
-
-        public string GetShortcode()
-        {
-            if (_mLenShortCode == 0)
-            {
-                return "NOT_SET";
-            }
-            else
-            {
-                return _mShortcode;
-            }
-        }
-
-        public string GetStreamId()
-        {
-            if (_mLenStreamId == 0)
-            {
-                return "NOT_SET";
-            }
-            else
-            {
-                return _mStreamId;
-            }
-        }
-
-        public string GetStreamKey()
-        {
-            if (_mLenStreamKey == 0)
-            {
-                return "NOT_SET";
-            }
-            else
-            {
-                return _mStreamKey;
-            }
-        }
-
-        public string GetStreamFocus()
-        {
-            if (_mLenStreamFocus == 0)
-            {
-                return "NOT_SET";
-            }
-            else
-            {
-                return _mStreamFocus;
-            }
-        }
+        static bool ChromaON;
+        
+    
+    static int _mResult;        
 
         public void Start()
         {
-            ChromaSDK.APPINFOTYPE appInfo = new APPINFOTYPE();
-            appInfo.Title = "Razer Chroma test";
-            appInfo.Description = "A sample application using Razer Chroma SDK";
-
-            appInfo.Author_Name = "Razer";
-            appInfo.Author_Contact = "https://developer.razer.com/chroma";
-
-            //appInfo.SupportedDevice = 
-            //    0x01 | // Keyboards
-            //    0x02 | // Mice
-            //    0x04 | // Headset
-            //    0x08 | // Mousepads
-            //    0x10 | // Keypads
-            //    0x20   // ChromaLink devices
-            appInfo.SupportedDevice = (0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20);
-            //    0x01 | // Utility. (To specifiy this is an utility application)
-            //    0x02   // Game. (To specifiy this is a game);
-            appInfo.Category = 1;
-            _mResult = ChromaAnimationAPI.InitSDK(ref appInfo);
-            switch (_mResult)
+            if (ChromaON)
             {
-                case RazerErrors.RZRESULT_DLL_NOT_FOUND:
-                    Console.Error.WriteLine("Chroma DLL is not found! {0}", RazerErrors.GetResultString(_mResult));
-                    break;
-                case RazerErrors.RZRESULT_DLL_INVALID_SIGNATURE:
-                    Console.Error.WriteLine("Chroma DLL has an invalid signature! {0}", RazerErrors.GetResultString(_mResult));
-                    break;
-                case RazerErrors.RZRESULT_SUCCESS:
-                    break;
-                default:
-                    Console.Error.WriteLine("Failed to initialize Chroma! {0}", RazerErrors.GetResultString(_mResult));
-                    break;
-            }
-        }
-        public void OnApplicationQuit()
-        {
-            if (_mResult == RazerErrors.RZRESULT_SUCCESS)
-            {
-                if (ChromaAnimationAPI.IsInitialized())
+                if (GetInitResult() == RazerErrors.RZRESULT_SUCCESS)
                 {
-                    ChromaAnimationAPI.StopAll();
-                    ChromaAnimationAPI.CloseAll();
-                    int result = ChromaAnimationAPI.Uninit();
-                    ChromaAnimationAPI.UninitAPI();
-                    if (result != RazerErrors.RZRESULT_SUCCESS)
-                    {
-                        Console.Error.WriteLine("Failed to uninitialize Chroma!");
-                    }
+                    Console.WriteLine("razerChroma attivo e funzionante");
                 }
+                else { Console.WriteLine("razerChroma in errore"); }
             }
-        }
 
-        public string GetEffectName(int index, byte platform)
-        {
-            switch (index)
-            {
-                default:
-                    return string.Format("Effect{0}", index);
-            }
-        }
-
-        public void ExecuteItem(int index, bool supportsStreaming, byte platform)
-        {
-            switch (index)
-            {
-
-                case 1:
-                    ShowEffect1();
-                    ShowEffect1ChromaLink();
-                    ShowEffect1Headset();
-                    ShowEffect1Keypad();
-                    ShowEffect1Mousepad();
-                    ShowEffect1Mouse();
-                    
-                    break;
-            }
-        }
-
-        #region Autogenerated
-
-
-
-        public void ShowEffect1() //ex 45
-
-        { 
             int[] keys = {
             (int)Keyboard.RZKEY.RZKEY_ESC,
             (int)Keyboard.RZKEY.RZKEY_OEM_1, //backslash \
@@ -285,28 +143,29 @@ namespace Telemetry_ACC_with_razer_Chroma
             (int)Keyboard.RZKEY.RZKEY_NUMPAD_MULTIPLY,
             (int)Keyboard.RZKEY.RZKEY_NUMPAD_ADD,
             (int)Keyboard.RZKEY.RZKEY_NUMPAD_SUBTRACT,
-            //(int)Keyboard.RZKEY.RZKEY_MACRO1,
-            //(int)Keyboard.RZKEY.RZKEY_MACRO2,
-            //(int)Keyboard.RZKEY.RZKEY_MACRO3,
-            //(int)Keyboard.RZKEY.RZKEY_MACRO4,
-            //(int)Keyboard.RZKEY.RZKEY_MACRO5,
-            //(int)Keyboard.RZKEY.RZKEY_OEM_6,
-            //(int)Keyboard.RZKEY.RZKEY_JPN_1,
-            //(int)Keyboard.RZKEY.RZKEY_JPN_2,
-            //(int)Keyboard.RZKEY.RZKEY_JPN_3,
-            //(int)Keyboard.RZKEY.RZKEY_JPN_4,
-            //(int)Keyboard.RZKEY.RZKEY_JPN_5,
-            //(int)Keyboard.RZKEY.RZKEY_KOR_1,
-            //(int)Keyboard.RZKEY.RZKEY_KOR_2,
-            //(int)Keyboard.RZKEY.RZKEY_KOR_3,
-            //(int)Keyboard.RZKEY.RZKEY_KOR_4,
-            //(int)Keyboard.RZKEY.RZKEY_KOR_5,
-            //(int)Keyboard.RZKEY.RZKEY_KOR_6,
-            //(int)Keyboard.RZKEY.RZKEY_KOR_7,
+            (int)Keyboard.RZKEY.RZKEY_MACRO1,
+            (int)Keyboard.RZKEY.RZKEY_MACRO2,
+            (int)Keyboard.RZKEY.RZKEY_MACRO3,
+            (int)Keyboard.RZKEY.RZKEY_MACRO4,
+            (int)Keyboard.RZKEY.RZKEY_MACRO5,
+            (int)Keyboard.RZKEY.RZKEY_OEM_6,
+            (int)Keyboard.RZKEY.RZKEY_JPN_1,
+            (int)Keyboard.RZKEY.RZKEY_JPN_2,
+            (int)Keyboard.RZKEY.RZKEY_JPN_3,
+            (int)Keyboard.RZKEY.RZKEY_JPN_4,
+            (int)Keyboard.RZKEY.RZKEY_JPN_5,
+            (int)Keyboard.RZKEY.RZKEY_KOR_1,
+            (int)Keyboard.RZKEY.RZKEY_KOR_2,
+            (int)Keyboard.RZKEY.RZKEY_KOR_3,
+            (int)Keyboard.RZKEY.RZKEY_KOR_4,
+            (int)Keyboard.RZKEY.RZKEY_KOR_5,
+            (int)Keyboard.RZKEY.RZKEY_KOR_6,
+            (int)Keyboard.RZKEY.RZKEY_KOR_7,
             //(int)Keyboard.RZKEY.RZKEY_INVALID,
 
             }; //ordine accensione tastiera
-            int RPM=0;
+
+            int RPM = 0;
             int frameCount = 120;
             int attempt = 0;
             bool a = true;
@@ -317,174 +176,27 @@ namespace Telemetry_ACC_with_razer_Chroma
             bool w = true;
             bool s = false;
             bool start;
-            int RPMMax=7000;
+            int RPMMax = 7000;
             String MEMORY_LOCATION_PHYSICS = "Local\\acpmf_physics";
             String MEMORY_LOCATION_STATIC = "Local\\acpmf_static";
             String MEMORY_LOCATION_GRAPHICS = "Local\\acpmf_graphics";
             var data = new MyStatic();
-            var phisics =new MyPhysics();
-            var graphics =new myGraphics();
-            changeLowRpm();
+            var phisics = new MyPhysics();
+            var graphics = new myGraphics();
+            //changeLowRpm();
             mapFileStatic();
             string path = "";
-            //Excel excel = new Excel();
             excel.CreateNewFile();
-           // excel.SaveAs("recovery.xlsx");
-            excel.Close();
+           
             int LastSectorTime = 0;
             int sector2 = 0;
             int split;
             mapFilePhisics();
-           
 
-            void showRpm(int rpm) {                    
-                Console.WriteLine("ciao"+rpm);                    
-            }
-            //changeRpm(0);
-            void changeHighRpm()
+
+            void showRpm(int rpm)
             {
-                    
-                    string baseLayer = "Animations/Blank_Keyboard.chroma";
-                // close the blank animation if it's already loaded, discarding any changes
-                    ChromaAnimationAPI.CloseAnimationName(baseLayer);
-                    // open the blank animation, passing a reference to the base animation when loading has completed
-                    ChromaAnimationAPI.GetAnimation(baseLayer);
-                    // the length of the animation
-                    frameCount = 6;
-                    // set all frames to white, with all frames set to 30FPS
-                    ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayer, frameCount, 0.016f, 255, 0, 0);
-                    // fade the start of the animation starting at frame zero to 40
-                    ChromaAnimationAPI.FadeStartFramesName(baseLayer, 5);
-                    // play the animation on the dynamic canvas
-                    ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
-
-
-                //animazione originale
-                // start with a blank animation
-                //string baseLayer = "Animations/Blank_ChromaLink.chroma";
-                //// close the blank animation if it's already loaded, discarding any changes
-                //ChromaAnimationAPI.CloseAnimationName(baseLayer);
-                //// open the blank animation, passing a reference to the base animation when loading has completed
-                //ChromaAnimationAPI.GetAnimation(baseLayer);
-                //// the length of the animation
-                //int frameCount = 50;
-                //// set all frames to white, with all frames set to 30FPS
-                //ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayer, frameCount, 0.033f, 255, 255, 255);
-                //// fade the start of the animation starting at frame zero to 40
-                //ChromaAnimationAPI.FadeStartFramesName(baseLayer, 40);
-                //// play the animation on the dynamic canvas
-                //ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
-
-
-            }
-
-            void changeOrangeRpm()
-            {
-                //blocca il rosso su crhomalink
-                string baseLayerChromaLink = "Animations/Blank_ChromaLink.chroma";
-                ChromaAnimationAPI.CloseAnimationName(baseLayerChromaLink);
-                ChromaAnimationAPI.GetAnimation(baseLayerChromaLink);
-                // set all frames to Orange, with all frames
-                ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayerChromaLink, frameCount, 0f, 255, 60, 0);
-                // play the animation on the dynamic canvas
-                ChromaAnimationAPI.PlayAnimationName(baseLayerChromaLink, true);
-
-                string baseLayer = "Animations/Blank_Keyboard.chroma";
-                ChromaAnimationAPI.CloseAnimationName(baseLayer);
-                ChromaAnimationAPI.GetAnimation(baseLayer);
-                ChromaAnimationAPI.SetKeysColorAllFramesRGBName(baseLayer, keys, keys.Length, 255, 60, 0);
-                ChromaAnimationAPI.SetChromaCustomColorAllFramesName(baseLayer);
-                ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
-
-            }
-
-            void changeGreenRpm()
-            {
-                //blocca il rosso su crhomalink
-                string baseLayerChromaLink = "Animations/Blank_ChromaLink.chroma";
-                ChromaAnimationAPI.CloseAnimationName(baseLayerChromaLink);
-                ChromaAnimationAPI.GetAnimation(baseLayerChromaLink);
-                // set all frames to green, with all frames
-                ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayerChromaLink, frameCount, 0f, 0, 125,0 );
-                // play the animation on the dynamic canvas
-                ChromaAnimationAPI.PlayAnimationName(baseLayerChromaLink, true);
-
-                string baseLayer = "Animations/Blank_Keyboard.chroma";
-                ChromaAnimationAPI.CloseAnimationName(baseLayer);
-                ChromaAnimationAPI.GetAnimation(baseLayer);
-                ChromaAnimationAPI.SetKeysColorAllFramesRGBName(baseLayer, keys, keys.Length, 0, 125,0 );
-                ChromaAnimationAPI.SetChromaCustomColorAllFramesName(baseLayer);
-                ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
-            }
-
-            void changeLowRpm()
-            {
-                //blocca il rosso su crhomalink
-                string baseLayerChromaLink = "Animations/Blank_ChromaLink.chroma";
-                ChromaAnimationAPI.CloseAnimationName(baseLayerChromaLink);
-                ChromaAnimationAPI.GetAnimation(baseLayerChromaLink);
-                // set all frames to blu, with all frames
-                ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayerChromaLink, frameCount, 0f, 0, 0,125);
-                // play the animation on the dynamic canvas
-                ChromaAnimationAPI.PlayAnimationName(baseLayerChromaLink, true);
-
-                string baseLayer = "Animations/Blank_Keyboard.chroma";
-                ChromaAnimationAPI.CloseAnimationName(baseLayer);
-                ChromaAnimationAPI.GetAnimation(baseLayer);
-                ChromaAnimationAPI.SetKeysColorAllFramesRGBName(baseLayer, keys, keys.Length, 0,0,125);
-                ChromaAnimationAPI.SetChromaCustomColorAllFramesName(baseLayer);
-                ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
-
-
-                //animazione originale 45
-
-                //        string baseLayer = "Animations/Blank_Keyboard.chroma";
-                //        ChromaAnimationAPI.CloseAnimationName(baseLayer);
-                //        ChromaAnimationAPI.GetAnimation(baseLayer);
-                //        int frameCount = 120;
-                //        ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayer, frameCount, 0.1f, 64, 64, 64);
-                //        int[] keys = {
-                //    (int)Keyboard.RZKEY.RZKEY_W,
-                //    (int)Keyboard.RZKEY.RZKEY_A,
-                //    (int)Keyboard.RZKEY.RZKEY_S,
-                //    (int)Keyboard.RZKEY.RZKEY_D,
-                //};
-                //        ChromaAnimationAPI.SetKeysColorAllFramesRGBName(baseLayer, keys, keys.Length, 255, 255, 0);
-                //        keys = new int[] {
-                //    (int)Keyboard.RZKEY.RZKEY_F1,
-                //    (int)Keyboard.RZKEY.RZKEY_F2,
-                //    (int)Keyboard.RZKEY.RZKEY_F3,
-                //    (int)Keyboard.RZKEY.RZKEY_F4,
-                //    (int)Keyboard.RZKEY.RZKEY_F5,
-                //    (int)Keyboard.RZKEY.RZKEY_F6,
-                //};
-                //        float t = 0;
-                //        float speed = 0.05f;
-                //        for (int frameId = 0; frameId < frameCount; ++frameId)
-                //        {
-                //            t += speed;
-                //            float hp = (float)Math.Abs(Math.Cos(Math.PI / 2.0f + t));
-                //            for (int i = 0; i < keys.Length; ++i)
-                //            {
-                //                float ratio = (i + 1) / keys.Length;
-                //                int color = ChromaAnimationAPI.GetRGB(0, (int)(255 * (1 - hp)), 0);
-                //                if ((i + 1) / (float)(keys.Length + 1) < hp)
-                //                {
-                //                    color = ChromaAnimationAPI.GetRGB(0, 255, 0);
-                //                }
-                //                else
-                //                {
-                //                    color = ChromaAnimationAPI.GetRGB(0, 100, 0);
-                //                }
-                //                int key = keys[i];
-                //                ChromaAnimationAPI.SetKeyColorName(baseLayer, frameId, key, color);
-                //            }
-                //        }
-                //        ChromaAnimationAPI.SetChromaCustomFlagName(baseLayer, true);
-                //        ChromaAnimationAPI.SetChromaCustomColorAllFramesName(baseLayer);
-                //        ChromaAnimationAPI.OverrideFrameDurationName(baseLayer, 0.033f);
-                //        ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
-
+                Console.WriteLine("ciao" + rpm);
             }
 
             void mapFilePhisics()
@@ -496,9 +208,9 @@ namespace Telemetry_ACC_with_razer_Chroma
                     {
                         using (MemoryMappedFile mmp = MemoryMappedFile.OpenExisting(MEMORY_LOCATION_PHYSICS))
                         {
-                        start = true;
-                            
-                        runStream(mmp);
+                            start = true;
+
+                            runStream(mmp);
                             break;
                         }
                     }
@@ -506,7 +218,7 @@ namespace Telemetry_ACC_with_razer_Chroma
                     {
 
                         Console.WriteLine("in attesa di connettersi al gioco");
-                        Thread.Sleep(10000);
+                        Thread.Sleep(1000);
                     }
                 } while (true);
             }
@@ -609,7 +321,7 @@ namespace Telemetry_ACC_with_razer_Chroma
                                 //data.char5 = new string(char1);
 
 
-                                
+
                                 //accessor.Read(0, out data);
                                 // Write the data to the accessor
                                 //accessor.Write(0, ref data);
@@ -657,16 +369,16 @@ namespace Telemetry_ACC_with_razer_Chroma
             }
 
             void runStream(MemoryMappedFile aMemoryMappedFile)
+            {
+                using (MemoryMappedViewStream myStream = aMemoryMappedFile.CreateViewStream())
                 {
-                    using (MemoryMappedViewStream myStream = aMemoryMappedFile.CreateViewStream())
+                    BinaryReader myReader = new BinaryReader(myStream);
+
+                    int mySleepMillis = 17;
+
+
+                    while (true)
                     {
-                        BinaryReader myReader = new BinaryReader(myStream);
-
-                        int mySleepMillis = 17;
-                        
-
-                        while (true)
-                        {
                         using (var accessor = aMemoryMappedFile.CreateViewAccessor())
                         {
 
@@ -680,8 +392,8 @@ namespace Telemetry_ACC_with_razer_Chroma
                                 graphics.PacketId = accessor2.ReadInt32(0);
                                 graphics.GameState = (GameStates)accessor2.ReadChar(4);
                                 graphics.Session = (SessionTypes)accessor2.ReadChar(8);
-                                graphics.CompletedLaps =accessor2.ReadInt32(132);
-                                graphics.Position =accessor2.ReadInt32(136);
+                                graphics.CompletedLaps = accessor2.ReadInt32(132);
+                                graphics.Position = accessor2.ReadInt32(136);
                                 graphics.CurrentTimeMilliSeconds = accessor2.ReadInt32(140);
                                 graphics.LastTimeMilliSeconds = accessor2.ReadInt32(144);
                                 graphics.BestTimeMilliSeconds = accessor2.ReadInt32(148);
@@ -700,7 +412,7 @@ namespace Telemetry_ACC_with_razer_Chroma
                                 graphics.CarId = accessor2.ReadInt32(1216);
                                 graphics.PenaltyTime = accessor2.ReadSingle(1220);
                                 graphics.Flag = (FlagTypes)accessor2.ReadChar(1224);
-                                graphics.Penalty =(PenaltyTypes)accessor2.ReadChar(1228);
+                                graphics.Penalty = (PenaltyTypes)accessor2.ReadChar(1228);
                                 graphics.IdealLineOn = accessor2.ReadInt32(1232);
                                 graphics.IsInPitLane = accessor2.ReadInt32(1236);
                                 graphics.SurfaceGrip = accessor2.ReadSingle(1240);
@@ -709,29 +421,29 @@ namespace Telemetry_ACC_with_razer_Chroma
                                 graphics.WindDirection = accessor2.ReadSingle(1252);
                                 graphics.IsSetupMenuVisible = accessor2.ReadInt32(1256);
                                 graphics.MainDisplayIndex = accessor2.ReadInt32(1260);
-                                graphics.SecondaryDisplayIndex=accessor2.ReadInt32(1264);
-                                graphics.TC=accessor2.ReadInt32(1268);
-                                graphics.TCUT=accessor2.ReadInt32(1272);
-                                graphics.EngineMap=accessor2.ReadInt32(1276);
-                                graphics.ABS=accessor2.ReadInt32(1280);
-                                graphics.FuelXLap=accessor2.ReadSingle(1284);
-                                graphics.RainLights=accessor2.ReadInt32(1288);
-                                graphics.FlashingLights=accessor2.ReadInt32(1292);
-                                graphics.LightsStage=accessor2.ReadInt32(1296);
-                                graphics.ExhaustTemperature=accessor2.ReadSingle(1300);
-                                graphics.WiperLV=accessor2.ReadInt32(1304);
-                                graphics.DriverStingTotalTimeLeft=accessor2.ReadInt32(1308);
-                                graphics.DriverStingTimeLeft=accessor2.ReadInt32(1312);
-                                graphics.RainTyres=accessor2.ReadInt32(1316);
-                                graphics.SessionIndex=accessor2.ReadInt32(1320);
+                                graphics.SecondaryDisplayIndex = accessor2.ReadInt32(1264);
+                                graphics.TC = accessor2.ReadInt32(1268);
+                                graphics.TCUT = accessor2.ReadInt32(1272);
+                                graphics.EngineMap = accessor2.ReadInt32(1276);
+                                graphics.ABS = accessor2.ReadInt32(1280);
+                                graphics.FuelXLap = accessor2.ReadSingle(1284);
+                                graphics.RainLights = accessor2.ReadInt32(1288);
+                                graphics.FlashingLights = accessor2.ReadInt32(1292);
+                                graphics.LightsStage = accessor2.ReadInt32(1296);
+                                graphics.ExhaustTemperature = accessor2.ReadSingle(1300);
+                                graphics.WiperLV = accessor2.ReadInt32(1304);
+                                graphics.DriverStingTotalTimeLeft = accessor2.ReadInt32(1308);
+                                graphics.DriverStingTimeLeft = accessor2.ReadInt32(1312);
+                                graphics.RainTyres = accessor2.ReadInt32(1316);
+                                graphics.SessionIndex = accessor2.ReadInt32(1320);
                                 graphics.UsedFuel = accessor2.ReadSingle(1324);
                                 graphics.DeltaLapTimeInMilliSeconds = accessor2.ReadInt32(1358);
                                 graphics.EstimatedLapTimeInMilliSeconds = accessor2.ReadInt32(1392);
                                 graphics.IsDeltaPositive = accessor2.ReadInt32(1400);
-                                graphics.Isplit= accessor2.ReadInt32(1404);
-                                graphics.IsValidLap= accessor2.ReadInt32(1408);
+                                graphics.Isplit = accessor2.ReadInt32(1404);
+                                graphics.IsValidLap = accessor2.ReadInt32(1408);
                                 graphics.FuelEstimatedLaps = accessor2.ReadSingle(1412);
-                                graphics.MissingMandatoryPits= accessor2.ReadInt32(1484);
+                                graphics.MissingMandatoryPits = accessor2.ReadInt32(1484);
                                 graphics.Clock = accessor2.ReadSingle(1488);
                                 graphics.DirectionLightsLeft = accessor2.ReadInt32(1492);
                                 graphics.DirectionLightsRight = accessor2.ReadInt32(1496);
@@ -763,9 +475,9 @@ namespace Telemetry_ACC_with_razer_Chroma
                                 var BestTime = new char[15];
                                 var Split = new char[15];
                                 var TyreCompound = new char[33];
-                                var carCoordinatesReadX= new float[3];
-                                var carCoordinatesReadY= new float[3];
-                                var carCoordinatesReadZ= new float[3];
+                                var carCoordinatesReadX = new float[3];
+                                var carCoordinatesReadY = new float[3];
+                                var carCoordinatesReadZ = new float[3];
                                 var CarIds = new int[60];
                                 var DeltaLapTime = new char[15];
                                 var EstimatedLapTime = new char[15];
@@ -777,8 +489,8 @@ namespace Telemetry_ACC_with_razer_Chroma
                                 accessor2.ReadArray(102, Split, 0, 15);
                                 accessor2.ReadArray(176, TyreCompound, 0, 33);
                                 accessor2.ReadArray(1328, DeltaLapTime, 0, 15);
-                                accessor2.ReadArray(1362 , EstimatedLapTime,0, 15);
-                                accessor2.ReadArray(1416 , TrackStatus,0, 33);
+                                accessor2.ReadArray(1362, EstimatedLapTime, 0, 15);
+                                accessor2.ReadArray(1416, TrackStatus, 0, 33);
 
                                 //accessor2.ReadArray(256, carCoordinatesReadX, 0, 3);
                                 //accessor2.ReadArray(260, carCoordinatesReadY, 0, 3);
@@ -789,7 +501,7 @@ namespace Telemetry_ACC_with_razer_Chroma
                                 graphics.LastTime = new string(LastTime);
                                 graphics.BestTime = new string(BestTime);
                                 graphics.Split = new string(Split);
-                                graphics.TyreCompound= new string(TyreCompound);
+                                graphics.TyreCompound = new string(TyreCompound);
                                 graphics.DeltaLapTime = new string(DeltaLapTime);
                                 graphics.EstimatedLapTime = new string(EstimatedLapTime);
                                 //graphics.CarCoordinatesX = carCoordinatesReadX;
@@ -819,19 +531,18 @@ namespace Telemetry_ACC_with_razer_Chroma
                             }
                         }
 
-                        singleReadAndWrite();
-
-                            Thread.Sleep(mySleepMillis);
-                        }
+                        singleReadAndWrite(); 
+                        Thread.Sleep(mySleepMillis);
                     }
                 }
-                void singleReadAndWrite()
-                {
-                
+            }
+            void singleReadAndWrite()
+            {
+
                 while (start == true)
                 {
-                        try
-                        {
+                    try
+                    {
                         string auto = Regex.Replace(data.carModel, "[^a-zA-Z0-9_]", "");
                         switch (auto)
                         {
@@ -981,49 +692,50 @@ namespace Telemetry_ACC_with_razer_Chroma
                         //Console.WriteLine(start);
                         RPM = 0;
                         //RPM = int.Parse(radiantsminut);
-                        RPM=phisics.rpm;
+                        RPM = phisics.rpm;
                         Console.WriteLine("L'auto è: " + auto + " e il limitatore è a: " + RPMMax + " rpm");
                         Console.WriteLine("Connesso e in azione");
                         s = true;
                         falseStart();
-                        
+
                         //Console.WriteLine(start);
 
                     }
                     catch (Exception)
+                    {
+                        if (attempt > 10)
                         {
-                            if (attempt > 10)
-                            {
-                                Console.WriteLine("riavvio");
-                                attempt = 0;
-                                trueStart();
-                                mapFileStatic();
-                                mapFilePhisics();
-                            }
-                            RPM = 0;
-                            RPM = phisics.rpm;
-                            Console.WriteLine("attesa avvio motore");
-                            Thread.Sleep(3000);
+                            Console.WriteLine("riavvio");
+                            attempt = 0;
                             trueStart();
-                            attempt++;
-                            
-                            Console.WriteLine("ho effettuato "+attempt+" tentativi di connessione al gioco.");
+                            mapFileStatic();
+                            mapFilePhisics();
                         }
-                    } 
-                        RPM=phisics.rpm;
+                        RPM = 0;
+                        RPM = phisics.rpm;
+                        Console.WriteLine("attesa avvio motore");
+                        Thread.Sleep(3000);
+                        trueStart();
+                        attempt++;
+
+                        Console.WriteLine("ho effettuato " + attempt + " tentativi di connessione al gioco.");
+                    }
+                }
+                RPM = phisics.rpm;
                 //Console.WriteLine(phisics.tyreTempFR);
 
                 //string path="";
-                
+
 
                 split = graphics.LastSectorTimeMilliSeconds;
                 //Console.WriteLine(split);
 
-                if ((graphics.GameState) != 0 && graphics.CurrentSector!=0 && split>LastSectorTime)
+                if ((graphics.GameState) != 0 && graphics.CurrentSector != 0 && split > LastSectorTime)
                 {
-                    Console.WriteLine($"Giro: {graphics.CompletedLaps+1} Settore: {graphics.CurrentSector}   {graphics.LastSectorTimeMilliSeconds}");
+                    Console.WriteLine($"Giro: {graphics.CompletedLaps + 1} Settore: {graphics.CurrentSector}   {graphics.LastSectorTimeMilliSeconds}");
 
-                    excel.WriteToCell(graphics.CompletedLaps, (graphics.CurrentSector), ((split-LastSectorTime)).ToString());
+                    excel.WriteToCell(graphics.CompletedLaps, (graphics.CurrentSector), ((split - LastSectorTime)).ToString());
+                    //Console.WriteLine("settore salvato in excel");
                     LastSectorTime = split;
                     if (graphics.CurrentSector == 2)
                     {
@@ -1032,10 +744,11 @@ namespace Telemetry_ACC_with_razer_Chroma
 
 
                 }
-                if ((graphics.GameState) != 0 && (graphics.CurrentSector) ==0 && (graphics.CompletedLaps)>0)
-                {   excel.WriteToCell((graphics.CompletedLaps - 1),0,"Lap: " + (graphics.CompletedLaps).ToString());
-                    excel.WriteToCell((graphics.CompletedLaps-1), 3, (graphics.LastTimeMilliSeconds-sector2).ToString());
-                    Console.WriteLine($"Giro: {graphics.CompletedLaps} Settore: 3   {graphics.LastTimeMilliSeconds-sector2}");
+                if ((graphics.GameState) != 0 && (graphics.CurrentSector) == 0 && (graphics.CompletedLaps) > 0)
+                {
+                    excel.WriteToCell((graphics.CompletedLaps - 1), 0, "Lap: " + (graphics.CompletedLaps).ToString());
+                    excel.WriteToCell((graphics.CompletedLaps - 1), 3, (graphics.LastTimeMilliSeconds - sector2).ToString());
+                    Console.WriteLine($"Giro: {graphics.CompletedLaps} Settore: 3   {graphics.LastTimeMilliSeconds - sector2}");
                     LastSectorTime = split;
                 }
 
@@ -1052,96 +765,231 @@ namespace Telemetry_ACC_with_razer_Chroma
                     s = false;
                 }
 
+               
 
+                if (d == true && RPM >= RPMMax && ChromaON)
+                {
+                    a = true;
+                    b = true;
+                    c = true;
+                    d = false;
+                    changeHighRpm();
+                    //Thread.Sleep(1);
 
-                if ( d == true && RPM >= RPMMax)
-                        {
-                        a = true;
-                        b = true;
-                        c = true;
-                        d = false;
-                        changeHighRpm();
-                        ShowEffect1ChromaLink();
-                        //Thread.Sleep(1);
+                }
 
-                    }
-                    
-                    if ( c == true && RPM < RPMMax && RPM > (RPMMax-400))
-                        {
+                if (c == true && RPM < RPMMax && RPM > (RPMMax - 400) && ChromaON)
+                {
 
-                        a = true;
-                        b = true;
-                        c = false;
-                        d = true;
-                        changeOrangeRpm() ;
-                        //Thread.Sleep(1);
+                    a = true;
+                    b = true;
+                    c = false;
+                    d = true;
+                    changeOrangeRpm();
+                    //Thread.Sleep(1);
 
-                    }
-                    if (b == true && RPM<(RPMMax - 400) && RPM > (RPMMax - 4000))
-                    {
-                        a = true;
-                        b = false;
-                        c = true;
-                        d = true;
-                        changeGreenRpm();
-                        //Thread.Sleep(1);
+                }
+                if (b == true && RPM < (RPMMax - 400) && RPM > (RPMMax - 4000) && ChromaON)
+                {
+                    a = true;
+                    b = false;
+                    c = true;
+                    d = true;
+                    changeGreenRpm();
+                    //Thread.Sleep(1);
 
-                    }
-                    if (a == true && RPM < RPMMax-4000)
-                    {
-                        a = false;
-                        b = true;
-                        c = true;
-                        d = true;
-                        changeLowRpm();
-                    }
+                }
+                if (a == true && RPM < RPMMax - 4000 && ChromaON)
+                {
+                    a = false;
+                    b = true;
+                    c = true;
+                    d = true;
+                    changeLowRpm();
+                }
                 //showRpm(RPM);
-                    
+
 
             }
             void falseStart()
             {
                 start = false;
             }
-            void trueStart() 
+            void trueStart()
             {
                 start = true;
             }
+            void changeHighRpm()
+            {
+                string baseLayer = "Animations/Blank_Keyboard.chroma";
+                // close the blank animation if it's already loaded, discarding any changes
+                ChromaAnimationAPI.CloseAnimationName(baseLayer);
+                // open the blank animation, passing a reference to the base animation when loading has completed
+                ChromaAnimationAPI.GetAnimation(baseLayer);
+                // the length of the animation
+                frameCount = 6; //scrivere framcount al posto del 6
+                // set all frames to white, with all frames set to 30FPS
+                ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayer, frameCount, 0.016f, 255, 0, 0);
+                // fade the start of the animation starting at frame zero to 40
+                ChromaAnimationAPI.FadeStartFramesName(baseLayer, 5);
+                // play the animation on the dynamic canvas
+                ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
+
+                //void ShowEffect1ChromaLink()
+                //{
+                string baseLayerChromaLink = "Animations/Blank_ChromaLink.chroma";
+                ChromaAnimationAPI.CloseAnimationName(baseLayerChromaLink);
+                // open the blank animation, passing a reference to the base animation when loading has completed
+                ChromaAnimationAPI.GetAnimation(baseLayerChromaLink);
+                // set all frames to white, with all frames set to 30FPS
+                ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayerChromaLink, 6, 0.016f, 255, 0, 0);
+                // fade the start of the animation starting at frame zero to 40
+                ChromaAnimationAPI.FadeStartFramesName(baseLayerChromaLink, 5);
+                // play the animation on the dynamic canvas
+                ChromaAnimationAPI.PlayAnimationName(baseLayerChromaLink, true);
+                //}
+            }
+            void changeOrangeRpm()
+            {
+                //blocca il rosso su crhomalink
+                string baseLayerChromaLink = "Animations/Blank_ChromaLink.chroma";
+                ChromaAnimationAPI.CloseAnimationName(baseLayerChromaLink);
+                ChromaAnimationAPI.GetAnimation(baseLayerChromaLink);
+                // set all frames to Orange, with all frames
+                ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayerChromaLink, frameCount, 0f, 255, 60, 0);
+                // play the animation on the dynamic canvas
+                ChromaAnimationAPI.PlayAnimationName(baseLayerChromaLink, true);
+
+                string baseLayer = "Animations/Blank_Keyboard.chroma";
+                ChromaAnimationAPI.CloseAnimationName(baseLayer);
+                ChromaAnimationAPI.GetAnimation(baseLayer);
+                ChromaAnimationAPI.SetKeysColorAllFramesRGBName(baseLayer, keys, keys.Length, 255, 60, 0);
+                ChromaAnimationAPI.SetChromaCustomColorAllFramesName(baseLayer);
+                ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
+
+            }
+            void changeGreenRpm()
+            {
+                //blocca il rosso su chromalink
+                string baseLayerChromaLink = "Animations/Blank_ChromaLink.chroma";
+                ChromaAnimationAPI.CloseAnimationName(baseLayerChromaLink);
+                ChromaAnimationAPI.GetAnimation(baseLayerChromaLink);
+                // set all frames to green, with all frames
+                ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayerChromaLink, frameCount, 0f, 0, 125, 0);
+                // play the animation on the dynamic canvas
+                ChromaAnimationAPI.PlayAnimationName(baseLayerChromaLink, true);
+
+                string baseLayer = "Animations/Blank_Keyboard.chroma";
+                ChromaAnimationAPI.CloseAnimationName(baseLayer);
+                ChromaAnimationAPI.GetAnimation(baseLayer);
+                ChromaAnimationAPI.SetKeysColorAllFramesRGBName(baseLayer, keys, keys.Length, 0, 125, 0);
+                ChromaAnimationAPI.SetChromaCustomColorAllFramesName(baseLayer);
+                ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
+            }
+            void changeLowRpm()
+            {
+
+                //blocca il rosso su chromalink
+                string baseLayerChromaLink = "Animations/Blank_ChromaLink.chroma";
+                ChromaAnimationAPI.CloseAnimationName(baseLayerChromaLink);
+                ChromaAnimationAPI.GetAnimation(baseLayerChromaLink);
+                // set all frames to blu, with all frames
+                ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayerChromaLink, frameCount, 0f, 0, 0, 125);
+                // play the animation on the dynamic canvas
+                ChromaAnimationAPI.PlayAnimationName(baseLayerChromaLink, true);
+
+                string baseLayer = "Animations/Blank_Keyboard.chroma";
+                ChromaAnimationAPI.CloseAnimationName(baseLayer);
+                ChromaAnimationAPI.GetAnimation(baseLayer);
+                ChromaAnimationAPI.SetKeysColorAllFramesRGBName(baseLayer, keys, keys.Length, 1, 1, 125);
+                ChromaAnimationAPI.SetChromaCustomColorAllFramesName(baseLayer);
+                ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
+
+            }
+
+            /////////////////
         }
+        public void OnApplicationQuit()
+        {
+            if (_mResult == RazerErrors.RZRESULT_SUCCESS)
+            {
+                if (ChromaAnimationAPI.IsInitialized())
+                {
+                    ChromaAnimationAPI.StopAll();
+                    ChromaAnimationAPI.CloseAll();
+                    int result = ChromaAnimationAPI.Uninit();
+                    ChromaAnimationAPI.UninitAPI();
+                    if (result != RazerErrors.RZRESULT_SUCCESS)
+                    {
+                        Console.Error.WriteLine("Failed to uninitialize Chroma!");
+                    }
+                }
+            }
+        }
+
+        public string GetEffectName(int index, byte platform)
+        {
+            switch (index)
+            {
+                default:
+                    return string.Format("Effect{0}", index);
+            }
+        }
+        public void Chroma_APPINFO()
+        {
+            ChromaSDK.APPINFOTYPE appInfo = new APPINFOTYPE();
+            appInfo.Title = "Razer Chroma test";
+            appInfo.Description = "A sample application using Razer Chroma SDK";
+
+            appInfo.Author_Name = "Razer";
+            appInfo.Author_Contact = "https://developer.razer.com/chroma";
+
+            //appInfo.SupportedDevice = 
+            //    0x01 | // Keyboards
+            //    0x02 | // Mice
+            //    0x04 | // Headset
+            //    0x08 | // Mousepads
+            //    0x10 | // Keypads
+            //    0x20   // ChromaLink devices
+            appInfo.SupportedDevice = (0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20);
+            //    0x01 | // Utility. (To specifiy this is an utility application)
+            //    0x02   // Game. (To specifiy this is a game);
+            appInfo.Category = 1;
+            _mResult = ChromaAnimationAPI.InitSDK(ref appInfo);
+            switch (_mResult)
+            {
+                case RazerErrors.RZRESULT_DLL_NOT_FOUND:
+                    Console.Error.WriteLine("Chroma DLL is not found! {0}", RazerErrors.GetResultString(_mResult));
+                    break;
+                case RazerErrors.RZRESULT_DLL_INVALID_SIGNATURE:
+                    Console.Error.WriteLine("Chroma DLL has an invalid signature! {0}", RazerErrors.GetResultString(_mResult));
+                    break;
+                case RazerErrors.RZRESULT_SUCCESS:
+                    break;
+                default:
+                    Console.Error.WriteLine("Failed to initialize Chroma! {0}", RazerErrors.GetResultString(_mResult));
+                    break;
+            }
+        }
+
+       
+
+        #region Autogenerated
+
+
+
+  
+
+       
+
+         
+
         
 
 
-        void ShowEffect1ChromaLink()
-        {   string baseLayerChromaLink = "Animations/Blank_ChromaLink.chroma";
-            ChromaAnimationAPI.CloseAnimationName(baseLayerChromaLink);
-            // open the blank animation, passing a reference to the base animation when loading has completed
-            ChromaAnimationAPI.GetAnimation(baseLayerChromaLink);
-            // the length of the animation
-           int frameCount = 6;
-            // set all frames to white, with all frames set to 30FPS
-            ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayerChromaLink, frameCount, 0.016f, 255, 0, 0);
-            // fade the start of the animation starting at frame zero to 40
-            ChromaAnimationAPI.FadeStartFramesName(baseLayerChromaLink, 5);
-            // play the animation on the dynamic canvas
-            ChromaAnimationAPI.PlayAnimationName(baseLayerChromaLink, true);
+        
 
 
-            //codice originale
-
-
-            //string baseLayer = "Animations/Blank_ChromaLink.chroma";
-            //ChromaAnimationAPI.CloseAnimationName(baseLayer);
-            //ChromaAnimationAPI.GetAnimation(baseLayer);
-            //int frameCount = 50;
-            //ChromaAnimationAPI.MakeBlankFramesRGBName(baseLayer, frameCount, 0.1f, 255, 255, 255);
-            //ChromaAnimationAPI.FadeStartFramesName(baseLayer, frameCount / 2);
-            //ChromaAnimationAPI.FadeEndFramesName(baseLayer, frameCount / 2);
-            //int color1 = ChromaAnimationAPI.GetRGB(0, 64, 0);
-            //int color2 = ChromaAnimationAPI.GetRGB(0, 255, 0);
-            //ChromaAnimationAPI.MultiplyTargetColorLerpAllFramesName(baseLayer, color1, color2);
-            //ChromaAnimationAPI.OverrideFrameDurationName(baseLayer, 0.033f);
-            //ChromaAnimationAPI.PlayAnimationName(baseLayer, true);
-        }
         void ShowEffect1Headset()
         {
             string baseLayer = "Animations/Blank_Headset.chroma";
@@ -1215,10 +1063,18 @@ namespace Telemetry_ACC_with_razer_Chroma
         {
             excel.SaveAs("recovery.xlsx");
             //excel.Save();
-            excel.Close();
+            //excel.Close();
         }
 
         #endregion
+        public void ChromaOnTrue()
+        {
+            ChromaON = true;
+        }
+        public int GetInitResult()
+        {
+            return _mResult;
+        }
     }
 
     
