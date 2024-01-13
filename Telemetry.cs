@@ -1,4 +1,5 @@
 ﻿using ChromaSDK;
+using Microsoft.Office.Core;
 using System;
 using System.IO;
 using System.IO.MemoryMappedFiles;
@@ -11,8 +12,6 @@ using System.Threading;
 using System.Web;
 using static ChromaSDK.Keyboard;
 using static Telemetry_ACC_with_razer_Chroma.Refer.DataRefer;
-using System.Drawing;
-using Telemetry_ACC_with_razer_Chroma.Refer;
 
 
 namespace Telemetry_ACC_with_razer_Chroma
@@ -164,8 +163,10 @@ namespace Telemetry_ACC_with_razer_Chroma
             int attempt = 0;
             int RPMMax = 7000;
             int LastSectorTime = 0;
+            int sectorTemp = 0;
             int sector2 = 0;
             int split;
+            int l = 1;
             bool a = true;
             bool b = true;
             bool c = true;
@@ -182,8 +183,9 @@ namespace Telemetry_ACC_with_razer_Chroma
             var graphics = new myGraphics();
             mapFileStatic();
             string path = "";
-            string session="c";
-            excel.CreateNewFile();           
+            string session= "c";
+            string result = "";
+            //excel.CreateNewFile();           
             mapFilePhisics();
             
             void mapFileStatic()
@@ -331,7 +333,7 @@ namespace Telemetry_ACC_with_razer_Chroma
                 {
                     BinaryReader myReader = new BinaryReader(myStream);
 
-                    int mySleepMillis = 17;
+                    int mySleepMillis = 1;
 
                     while (true)
                     {
@@ -514,12 +516,25 @@ namespace Telemetry_ACC_with_razer_Chroma
 
             void singleReadAndWrite()
             {
-
+                if ((graphics.GameState) != 0 && w == true){
+                    //Excel excel = new Excel();
+                    mapFileStatic();
+                    excel.CreateNewFile();
+                    w = false;
+                }
+                if (graphics.GameState == 0)
+                {     
+                    w = true;
+                }
+                if (graphics.GameState != 0)
+                {
+                    s = true;
+                }
                 while (start == true)
                 {
                     try
                     {
-                        string auto = Regex.Replace(data.carModel, "[^a-zA-Z0-9_]", "");
+                        string auto = Regex.Replace(data.carModel, "[^a-zA-Z0-9_]", "");//qui assegno la stringa in modo da riconoscere i giri ideali per il cambio marci
                         switch (auto)
                         {
                             case "amr_v12_vantage_gt3":
@@ -696,30 +711,39 @@ namespace Telemetry_ACC_with_razer_Chroma
                 if ((graphics.GameState) != 0 && graphics.CurrentSector != 0 && split > LastSectorTime)
                 {
                     Console.WriteLine($"Giro: {graphics.CompletedLaps + 1} Settore: {graphics.CurrentSector}   {graphics.LastSectorTimeMilliSeconds}");
-                    //long millisecondi = 83234;
-                    //TimeSpan tempo = TimeSpan.FromMilliseconds(millisecondi);
-                    //string risultato = $"{tempo.Hours} ore, {tempo.Minutes} minuti, {tempo.Seconds} secondi e {tempo.Milliseconds} millisecondi";
-                    excel.WriteToCell(graphics.CompletedLaps+3, (graphics.CurrentSector), ((split - LastSectorTime)).ToString());
+                    sectorTemp = split - LastSectorTime;
+                    TimeSpan tempo = TimeSpan.FromMilliseconds(sectorTemp);
+                    /// {tempo.Hours}  /// funzione per ricavare le ore
+                    result = $"{tempo.Minutes}:{tempo.Seconds:D2}.{tempo.Milliseconds:D3}";
+                    excel.WriteToCell(graphics.CompletedLaps+3, (graphics.CurrentSector), $" {result}");
+                    //excel.WriteToCell(graphics.CompletedLaps+3, (graphics.CurrentSector), ((split - LastSectorTime)).ToString());
+                    Console.WriteLine(result);
                     //Console.WriteLine("settore salvato in excel");
                     LastSectorTime = split;
                     if (graphics.CurrentSector == 2)
                     {
+                        l = graphics.CompletedLaps;
                         sector2 = split;
                     }
                 }
-                if ((graphics.GameState) != 0 && (graphics.CurrentSector) == 0 && (graphics.CompletedLaps) > 0)//per provare
-                //if ((graphics.GameState) != 0 && (graphics.CurrentSector) == 0 && (graphics.CompletedLaps) > 0 &&LastSectorTime!=0)
+                if (graphics.GameState != 0 && graphics.CurrentSector == 0 && graphics.CompletedLaps > 0 && LastSectorTime!=0 && graphics.CurrentTimeMilliSeconds > 1000)
                     {
-                    Console.WriteLine(graphics.CompletedLaps);
-                    excel.WriteToCell((graphics.CompletedLaps +2), 0, "Lap: " + (graphics.CompletedLaps).ToString());
-                    excel.WriteToCell((graphics.CompletedLaps +2), 3, (graphics.LastTimeMilliSeconds - sector2).ToString());
-                    Console.WriteLine($"Giro: {graphics.CompletedLaps} Settore: 3   {graphics.LastTimeMilliSeconds - sector2}");
+                    l++;
+                    sectorTemp = graphics.LastTimeMilliSeconds - sector2;
+                    TimeSpan tempo = TimeSpan.FromMilliseconds(sectorTemp);
+                    result = $"{tempo.Minutes}:{tempo.Seconds:D2}.{tempo.Milliseconds:D3}";
+                    excel.WriteToCell((l +2), 0, "Lap: " + l);
+                    excel.WriteToCell((l +2), 3, $" {result}");
+                    Console.WriteLine($"Giro: {l} Settore: 3  {result}");
+                    sectorTemp = graphics.LastTimeMilliSeconds;//tempo del giro
+                    tempo = TimeSpan.FromMilliseconds(sectorTemp);
+                    result = $"{tempo.Minutes}:{tempo.Seconds:D2}.{tempo.Milliseconds:D3}";
+                    excel.WriteToCell((l + 2), 4,($" {result}"));
                     LastSectorTime = split;
-                    Console.WriteLine(graphics.CompletedLaps);
-
+                    s = true;
                 }
-
-                if ((graphics.GameState) == 0 && s == true )
+                
+                if ((graphics.GameState) == 0 && s == true && (excel.ReadCell(3, 0)) != "")
                 {
                     DateTime dataOdierna = DateTime.Today;
                     DateTime oraCorrente = DateTime.Now;
@@ -731,11 +755,16 @@ namespace Telemetry_ACC_with_razer_Chroma
                     excel.Close();
                     excel.CreateNewFile();
                     Console.WriteLine("ho salvato da fine sessione");
+                    excel.Quit();
                     s = false;
                 }
-                if (graphics.GameState != 0) 
+                if ((graphics.GameState) == 0 && s == true && (excel.ReadCell(3, 0)) == "")
                 {
-                s = true;
+                    excel.Close();
+
+                    //excel.Quit();
+
+                    s = false;
                 }
                 while (changeSession == true && graphics.GameState != 0)
                 {
@@ -743,8 +772,9 @@ namespace Telemetry_ACC_with_razer_Chroma
                     changeSession = false;
                 }
 
-                if (session != (graphics.Session).ToString() && (graphics.GameState) != 0 && (excel.ReadCell(3,0))!="" )
-                {
+                if (session != (graphics.Session).ToString() && (graphics.GameState) != 0)
+                //if (session != (graphics.Session).ToString() && (graphics.GameState) != 0 && (excel.ReadCell(3,0))!="")
+                    {
                     DateTime dataOdierna = DateTime.Today;
                     DateTime oraCorrente = DateTime.Now;
                     string giorno = dataOdierna.ToString("dd_MM_yyyy");

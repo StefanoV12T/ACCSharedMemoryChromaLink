@@ -20,9 +20,7 @@ namespace Telemetry_ACC_with_razer_Chroma
                 {
                 telemetry.ChromaOnTrue();
                 telemetry.Chroma_APPINFO();
-
                 }
-
             telemetry.Start();
         }
     }

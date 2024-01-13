@@ -62,6 +62,17 @@ namespace Telemetry_ACC_with_razer_Chroma
             ws.Cells[i, j].Value = s;
         }
 
+        public void ColorRedCell(int i, int j)
+        {
+            ws.Cells[i, j].Font.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.FromArgb(0, 255, 255, 255));
+            ws.Cells[i, j].Interior.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Red);
+        }
+        public void ColorWhiteCell(int i, int j)
+        {
+            ws.Cells[i, j].Font.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.FromArgb(0, 0, 0, 0));
+            ws.Cells[i, j].Interior.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.White);
+        }
+
         public void Save()
         {
             wb.Save();
@@ -75,6 +86,10 @@ namespace Telemetry_ACC_with_razer_Chroma
         public void Close()
         {
             wb.Close();
+        }
+        public void Quit()
+        {
+            excel.Quit();
         }
 
     }
