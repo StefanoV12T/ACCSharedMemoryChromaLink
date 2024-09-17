@@ -6,22 +6,18 @@ using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using CSharp_SampleApp;
 
 namespace Telemetry_ACC_with_razer_Chroma
 {
     class Program
-    {  
+    {      
         static void Main(string[] args)
         {
-            bool Chroma_On=true;
-            Telemetry telemetry = new Telemetry();
-            
-            if (Chroma_On)
-                {
-                telemetry.ChromaOnTrue();
-                telemetry.Chroma_APPINFO();
-                }
-            telemetry.Start();
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new Interfaccia());
         }
     }
 }

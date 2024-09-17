@@ -755,11 +755,13 @@ namespace Telemetry_ACC_with_razer_Chroma
                     excel.Close();
                     excel.CreateNewFile();
                     Console.WriteLine("ho salvato da fine sessione");
-                    excel.Quit();
+                    //excel.Quit();
                     s = false;
+                    w = true;
                 }
                 if ((graphics.GameState) == 0 && s == true && (excel.ReadCell(3, 0)) == "")
                 {
+                    excel.SaveAs(path);
                     excel.Close();
 
                     //excel.Quit();
@@ -784,11 +786,11 @@ namespace Telemetry_ACC_with_razer_Chroma
                     excel.SaveAs(path);
                     excel.Close();
                     excel.CreateNewFile();
-                    Console.WriteLine(excel.ReadCell(3, 0));
                     Console.WriteLine(graphics.GameState);
                     Console.WriteLine("ho salvato e cambiato sessione");
                     changeSession = true;
                     s = true;
+                    w = true;
                 }
 
                 if (d == true && RPM >= RPMMax && ChromaON)
